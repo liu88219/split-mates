@@ -1,0 +1,9 @@
+{
+  "name": "SplitMates 分帳好夥伴",
+  "short_name": "SplitMates",
+  "description": "LINE & IG 好友多人即時分帳平台",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#4f46e5"
+}
