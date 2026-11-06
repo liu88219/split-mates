@@ -5,5 +5,30 @@
 @layer base {
   body {
     -webkit-tap-highlight-color: transparent;
+    background-color: #FAF6EE;
+    color: #4A3525;
+    background-image: radial-gradient(rgba(176, 109, 62, 0.055) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+}
+
+@layer components {
+  .cream-card {
+    @apply bg-[#FFFDF9] border-2 border-[#E9DCCB] rounded-3xl shadow-[0_4px_0_#EAE0D2];
+  }
+  .cream-card-soft {
+    @apply bg-[#FFFDF9] border border-[#EADCCB] rounded-2xl shadow-[0_2px_10px_rgba(74,53,37,0.04)];
+  }
+  .cream-input {
+    @apply bg-[#FFFDF9] border-2 border-[#E5D5C1] text-[#4A3525] placeholder:text-[#B39B86] rounded-2xl focus:border-[#B06D3E] focus:ring-2 focus:ring-[#F5DFC6] outline-none transition;
+  }
+  .btn-quokka {
+    @apply bg-[#B06D3E] hover:bg-[#9C5E33] text-[#FFFDF9] border-2 border-[#4A3525] shadow-[0_3px_0_#4A3525] active:translate-y-[1px] active:shadow-[0_1px_0_#4A3525] transition-all;
+  }
+  .btn-butter {
+    @apply bg-[#FCE394] hover:bg-[#F9D876] text-[#4A3525] border-2 border-[#4A3525] shadow-[0_3px_0_#4A3525] active:translate-y-[1px] active:shadow-[0_1px_0_#4A3525] transition-all;
+  }
+  .btn-bobo {
+    @apply bg-[#FFFDF9] hover:bg-[#F6EFE4] text-[#4A3525] border-2 border-[#D9C7B2] shadow-[0_2px_0_#DFD0BE] active:translate-y-[1px] active:shadow-none transition-all;
   }
 }

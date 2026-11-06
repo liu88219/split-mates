@@ -17,6 +17,7 @@ import { generateLineIgSummaryText } from '../utils/settlement';
 import { renderSettlementCardToDataUrl } from '../utils/cardGenerator';
 import { shareFlexCardToLine } from '../services/liffService';
 import { syncGroupToCloud } from '../services/cloudSync';
+import { QuokkaFaceBadge } from './QuokkaBoboArt';
 
 interface ShareCardModalProps {
   isOpen: boolean;
@@ -53,7 +54,7 @@ export const ShareCardModal: React.FC<ShareCardModalProps> = ({
     QRCode.toDataURL(shareUrl, {
       width: 320,
       margin: 2,
-      color: { dark: '#0f172a', light: '#ffffff' },
+      color: { dark: '#3E2C1E', light: '#FFFDF9' },
     })
       .then((qr) => setQrDataUrl(qr))
       .catch(() => setQrDataUrl(''));
@@ -92,11 +93,11 @@ export const ShareCardModal: React.FC<ShareCardModalProps> = ({
     if (!cardDataUrl) return;
     const a = document.createElement('a');
     a.href = cardDataUrl;
-    a.download = `${group.name}-分帳結算單.png`;
+    a.download = `${group.name}-奶油結算小卡.png`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    showToast('💾 已下載高畫質結算圖片小卡！');
+    showToast('🍪 已下載高畫質 Quokka & BOBO 奶油結算小卡！');
   };
 
   const handleNativeShareImage = async () => {
@@ -136,44 +137,46 @@ export const ShareCardModal: React.FC<ShareCardModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-900/65 backdrop-blur-sm p-0 sm:p-4 overflow-y-auto">
-      <div className="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-[#3E2C1E]/45 backdrop-blur-sm p-0 sm:p-4 overflow-y-auto">
+      <div className="bg-[#FFFDF9] w-full max-w-lg rounded-t-3xl sm:rounded-3xl border-2 border-[#3E2C1E] shadow-[0_8px_0_#3E2C1E] overflow-hidden flex flex-col max-h-[92vh]">
         {/* Header */}
-        <div className="px-5 py-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 text-white flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-2">
-            <Share2 className="w-5 h-5" />
-            <h2 className="text-lg font-bold">📲 LINE & IG 結算分享中心</h2>
+        <div className="px-5 py-4 bg-[#FAF1E2] border-b-2 border-[#E6D4BE] text-[#3E2C1E] flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-2.5">
+            <QuokkaFaceBadge className="w-8 h-8 shrink-0" />
+            <h2 className="text-base sm:text-lg font-extrabold tracking-tight">
+              📲 LINE & IG 奶油結算分享中心
+            </h2>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-full hover:bg-white/20 transition"
+            className="p-1.5 rounded-full hover:bg-[#EADBC8]/60 text-[#5C4432] transition"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Sub-navigation Tabs */}
-        <div className="grid grid-cols-3 gap-1.5 p-2 bg-slate-100 border-b border-slate-200 shrink-0">
+        <div className="grid grid-cols-3 gap-1.5 p-2 bg-[#F4ECE0] border-b border-[#E6D5C1] shrink-0">
           <button
             type="button"
             onClick={() => setActiveTab('image')}
-            className={`py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition ${
+            className={`py-2 px-3 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition ${
               activeTab === 'image'
-                ? 'bg-white text-indigo-600 shadow-sm'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-[#FFFDF9] text-[#8F4D22] border-2 border-[#3E2C1E] shadow-[0_2px_0_#3E2C1E]'
+                : 'text-[#7A624E] hover:text-[#3E2C1E]'
             }`}
           >
             <ImageIcon className="w-4 h-4" />
-            <span>結算圖片小卡</span>
+            <span>奶油結算小卡</span>
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('text')}
-            className={`py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition ${
+            className={`py-2 px-3 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition ${
               activeTab === 'text'
-                ? 'bg-white text-indigo-600 shadow-sm'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-[#FFFDF9] text-[#8F4D22] border-2 border-[#3E2C1E] shadow-[0_2px_0_#3E2C1E]'
+                : 'text-[#7A624E] hover:text-[#3E2C1E]'
             }`}
           >
             <FileText className="w-4 h-4" />
@@ -182,10 +185,10 @@ export const ShareCardModal: React.FC<ShareCardModalProps> = ({
           <button
             type="button"
             onClick={() => setActiveTab('link')}
-            className={`py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition ${
+            className={`py-2 px-3 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition ${
               activeTab === 'link'
-                ? 'bg-white text-indigo-600 shadow-sm'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-[#FFFDF9] text-[#8F4D22] border-2 border-[#3E2C1E] shadow-[0_2px_0_#3E2C1E]'
+                : 'text-[#7A624E] hover:text-[#3E2C1E]'
             }`}
           >
             <Link2 className="w-4 h-4" />
@@ -194,7 +197,7 @@ export const ShareCardModal: React.FC<ShareCardModalProps> = ({
         </div>
 
         {toastMsg && (
-          <div className="mx-5 mt-3 px-4 py-2.5 rounded-xl bg-slate-900 text-white text-xs font-semibold text-center shadow-md">
+          <div className="mx-5 mt-3 px-4 py-2.5 rounded-2xl bg-[#3E2C1E] text-[#FFFDF9] text-xs font-bold text-center shadow-md">
             {toastMsg}
           </div>
         )}
@@ -203,19 +206,21 @@ export const ShareCardModal: React.FC<ShareCardModalProps> = ({
         <div className="p-5 overflow-y-auto space-y-4 flex-1">
           {activeTab === 'image' && (
             <div className="space-y-4">
-              <p className="text-xs text-slate-600 leading-relaxed">
-                自動將目前帳目繪製為高畫質結算小卡，可直接傳進 <strong>IG 小盒子 (DM)</strong>、<strong>IG 限時動態</strong> 或 <strong>LINE 群組</strong>（在手機內也可直接長按下方圖片儲存）：
+              <p className="text-xs text-[#6E5643] leading-relaxed">
+                自動將目前帳目繪製為高畫質 <strong>Quokka &amp; BOBO 簡約奶油結算小卡</strong>，可直接傳進 <strong>IG 小盒子</strong>、<strong>IG 限時動態</strong> 或 <strong>LINE 群組</strong>（在手機內也可長按圖片儲存）：
               </p>
 
-              <div className="rounded-2xl overflow-hidden border border-slate-200 shadow-inner bg-slate-900 flex justify-center">
+              <div className="rounded-2xl overflow-hidden border-2 border-[#E5D4BE] bg-[#F4EAE0] p-2 flex justify-center">
                 {cardDataUrl ? (
                   <img
                     src={cardDataUrl}
                     alt="分帳結算圖片小卡"
-                    className="w-full max-h-[380px] object-contain"
+                    className="w-full max-h-[380px] object-contain rounded-xl"
                   />
                 ) : (
-                  <div className="py-16 text-slate-400 text-sm">正在產生結算圖片小卡...</div>
+                  <div className="py-16 text-[#8C735D] text-sm font-bold">
+                    正在烤製奶油結算小卡...
+                  </div>
                 )}
               </div>
 
@@ -223,7 +228,7 @@ export const ShareCardModal: React.FC<ShareCardModalProps> = ({
                 <button
                   type="button"
                   onClick={handleNativeShareImage}
-                  className="py-3 px-4 rounded-2xl bg-gradient-to-r from-pink-600 via-rose-500 to-amber-500 text-white font-bold text-sm shadow-md hover:opacity-95 transition flex items-center justify-center gap-2"
+                  className="py-3 px-4 rounded-2xl font-extrabold text-sm flex items-center justify-center gap-2 btn-butter"
                 >
                   <Share2 className="w-4 h-4" />
                   傳送到 IG / LINE (原生分享)
@@ -231,10 +236,10 @@ export const ShareCardModal: React.FC<ShareCardModalProps> = ({
                 <button
                   type="button"
                   onClick={handleDownloadCard}
-                  className="py-3 px-4 rounded-2xl bg-slate-900 text-white font-bold text-sm hover:bg-slate-800 transition flex items-center justify-center gap-2"
+                  className="py-3 px-4 rounded-2xl font-extrabold text-sm flex items-center justify-center gap-2 btn-quokka"
                 >
                   <Download className="w-4 h-4" />
-                  下載結算小卡 (PNG)
+                  下載奶油結算小卡 (PNG)
                 </button>
               </div>
             </div>
@@ -242,20 +247,20 @@ export const ShareCardModal: React.FC<ShareCardModalProps> = ({
 
           {activeTab === 'text' && (
             <div className="space-y-4">
-              <p className="text-xs text-slate-600">
+              <p className="text-xs text-[#6E5643]">
                 已自動排版成適合手機閱讀的清單（含最少轉帳建議、每人淨額與收款帳號）：
               </p>
               <textarea
                 readOnly
                 rows={11}
                 value={summaryText}
-                className="w-full p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-mono text-slate-800 leading-relaxed focus:outline-none"
+                className="w-full p-3.5 rounded-2xl bg-[#FAF6EE] border-2 border-[#E5D5C1] text-xs font-mono text-[#3E2C1E] leading-relaxed focus:outline-none"
               />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 <button
                   type="button"
                   onClick={handleCopyText}
-                  className="py-3 px-4 rounded-2xl bg-indigo-600 text-white font-bold text-sm hover:bg-indigo-700 transition flex items-center justify-center gap-2"
+                  className="py-3 px-4 rounded-2xl font-extrabold text-sm flex items-center justify-center gap-2 btn-quokka"
                 >
                   {copiedText ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                   {copiedText ? '已複製結算文字！' : '一鍵複製文字 (貼到 IG / LINE)'}
@@ -263,7 +268,7 @@ export const ShareCardModal: React.FC<ShareCardModalProps> = ({
                 <button
                   type="button"
                   onClick={handleLineShare}
-                  className="py-3 px-4 rounded-2xl bg-[#06C755] text-white font-bold text-sm hover:opacity-95 transition flex items-center justify-center gap-2"
+                  className="py-3 px-4 rounded-2xl bg-[#06C755] hover:bg-[#05B34C] text-white border-2 border-[#3E2C1E] shadow-[0_3px_0_#3E2C1E] active:translate-y-[1px] active:shadow-[0_1px_0_#3E2C1E] font-extrabold text-sm transition-all flex items-center justify-center gap-2"
                 >
                   <MessageCircle className="w-4 h-4" />
                   一鍵轉發到 LINE 聊天室
@@ -275,41 +280,41 @@ export const ShareCardModal: React.FC<ShareCardModalProps> = ({
           {activeTab === 'link' && (
             <div className="space-y-4">
               {qrDataUrl && (
-                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col items-center text-center space-y-2">
-                  <div className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-700">
+                <div className="p-4 rounded-2xl bg-[#FAF6EE] border-2 border-[#E5D5C1] flex flex-col items-center text-center space-y-2">
+                  <div className="inline-flex items-center gap-1.5 text-xs font-extrabold text-[#8F4D22]">
                     <QrCode className="w-4 h-4" />
                     <span>手機相機 / LINE 掃描 QR Code 立即開啟本群組</span>
                   </div>
                   <img
                     src={qrDataUrl}
                     alt="群組手機開啟 QR Code"
-                    className="w-44 h-44 rounded-2xl border border-slate-200 shadow-sm bg-white p-2"
+                    className="w-44 h-44 rounded-2xl border-2 border-[#3E2C1E] shadow-[0_3px_0_#EAE0D2] bg-[#FFFDF9] p-2"
                   />
-                  <span className="text-[11px] text-slate-500">
+                  <span className="text-[11px] text-[#7A624E]">
                     面對面聚餐時，讓朋友直接掃描就能進來同一個分帳本！
                   </span>
                 </div>
               )}
 
-              <div className="p-4 rounded-2xl bg-indigo-50 border border-indigo-100 space-y-2">
-                <h3 className="text-sm font-bold text-indigo-950">
-                  💡 如何在 LINE 群組與 IG 小盒子共同記帳？
+              <div className="p-4 rounded-2xl bg-[#FFF7DC] border-2 border-[#EAD084] space-y-2">
+                <h3 className="text-sm font-extrabold text-[#4A3525]">
+                  🍪 如何在 LINE 群組與 IG 小盒子共同記帳？
                 </h3>
-                <ul className="text-xs text-indigo-900 space-y-1.5 list-disc list-inside leading-relaxed">
+                <ul className="text-xs text-[#6E5233] space-y-1.5 list-disc list-inside leading-relaxed">
                   <li>
                     將下方連結貼到 <strong>LINE 群組記事本/聊天室</strong> 或 <strong>IG 群組聊天室</strong>。
                   </li>
                   <li>
-                    親友在 LINE 或 IG 內直接點開連結，<strong>免下載 App、免註冊帳號</strong>即可看到最新帳目並新增花費！
+                    親友點開只會看到<strong>這一個分帳群組</strong>（不會看到妳的其他私人帳本），<strong>免下載 App、免註冊</strong>即可共同記帳！
                   </li>
                   <li>
-                    若已開啟 Firebase 雲端同步，所有人點開同一連結會<strong>毫秒級即時同步</strong>；未設定雲端時，連結內也會自動夾帶壓縮帳目快照！
+                    已內建<strong>永久雲端雙向同步</strong>，無論在手機主畫面、Safari 或 LINE 內新增修改，所有人都會即時同步更新！
                   </li>
                 </ul>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-600 mb-1.5">
+                <label className="block text-xs font-bold text-[#6E5643] mb-1.5">
                   群組專屬分享連結
                 </label>
                 <div className="flex gap-2">
@@ -317,12 +322,12 @@ export const ShareCardModal: React.FC<ShareCardModalProps> = ({
                     type="text"
                     readOnly
                     value={shareUrl}
-                    className="flex-1 px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-xs text-slate-700 font-mono"
+                    className="flex-1 px-3.5 py-2.5 text-xs font-mono cream-input"
                   />
                   <button
                     type="button"
                     onClick={handleCopyLink}
-                    className="px-4 py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-700 transition flex items-center gap-1.5 shrink-0"
+                    className="px-4 py-2.5 rounded-2xl text-xs font-extrabold flex items-center gap-1.5 shrink-0 btn-quokka"
                   >
                     {copiedLink ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                     {copiedLink ? '已複製' : '複製連結'}
@@ -333,7 +338,7 @@ export const ShareCardModal: React.FC<ShareCardModalProps> = ({
               <button
                 type="button"
                 onClick={handleLineShare}
-                className="w-full py-3 px-4 rounded-2xl bg-[#06C755] text-white font-bold text-sm hover:opacity-95 transition flex items-center justify-center gap-2"
+                className="w-full py-3 px-4 rounded-2xl bg-[#06C755] hover:bg-[#05B34C] text-white border-2 border-[#3E2C1E] shadow-[0_3px_0_#3E2C1E] active:translate-y-[1px] active:shadow-[0_1px_0_#3E2C1E] font-extrabold text-sm transition-all flex items-center justify-center gap-2"
               >
                 <MessageCircle className="w-4 h-4" />
                 直接轉發連結 / Flex 卡片給 LINE 好友

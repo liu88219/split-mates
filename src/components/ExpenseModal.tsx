@@ -3,7 +3,6 @@ import {
   X,
   Check,
   Users,
-  Calculator,
   Sparkles,
   RefreshCw,
   AlertCircle,
@@ -25,9 +24,11 @@ import {
   CURRENCY_LIST,
   CURRENCIES,
   formatMoney,
+  getCreamyAvatarClass,
   getDefaultExchangeRate,
 } from '../utils/currencies';
 import { computeSplitAmounts } from '../utils/settlement';
+import { BoboFaceBadge, QuokkaFaceBadge } from './QuokkaBoboArt';
 
 interface ExpenseModalProps {
   isOpen: boolean;
@@ -171,7 +172,6 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
       payerIdsToExclude.forEach((pid) => {
         next[pid] = 0;
       });
-      // Ensure at least non-payers are checked if everyone became 0
       const hasAnyActive = group.members.some(
         (m) => !payerIdsToExclude.includes(m.id) && (next[m.id] || 0) > 0
       );
@@ -200,7 +200,6 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
   const handleSelectSinglePayer = (memberId: string) => {
     setSinglePayerId(memberId);
     if (excludePayerFromSplit) {
-      // Restore previous payer and exclude new payer
       const next: Record<string, number> = {};
       group.members.forEach((m) => {
         if (m.id === memberId) {
@@ -238,7 +237,6 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
       }
     }
 
-    // Update excludePayerFromSplit indicator if user manually checked/unchecked payer
     if (currentPayerIds.includes(memberId)) {
       const allPayersZero = currentPayerIds.every((pid) => (next[pid] || 0) === 0);
       setExcludePayerFromSplit(allPayersZero);
@@ -261,7 +259,6 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
 
   const handleSplitModeChange = (newMode: SplitMode) => {
     setSplitMode(newMode);
-    // Preserve who is currently checked (> 0)
     const activeMembers = group.members.filter((m) => (splitValues[m.id] || 0) > 0);
     const targetMembers = activeMembers.length > 0 ? activeMembers : group.members;
     const activeSet = new Set(targetMembers.map((m) => m.id));
@@ -418,20 +415,20 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-900/60 backdrop-blur-sm p-0 sm:p-4 overflow-y-auto">
-      <div className="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-[#3E2C1E]/45 backdrop-blur-sm p-0 sm:p-4 overflow-y-auto">
+      <div className="bg-[#FFFDF9] w-full max-w-lg rounded-t-3xl sm:rounded-3xl border-2 border-[#3E2C1E] shadow-[0_8px_0_#3E2C1E] overflow-hidden flex flex-col max-h-[92vh]">
         {/* Header */}
-        <div className="px-5 py-4 bg-gradient-to-r from-indigo-600 to-violet-600 text-white flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-2">
-            <Calculator className="w-5 h-5" />
-            <h2 className="text-lg font-bold">
+        <div className="px-5 py-4 bg-[#FAF1E2] border-b-2 border-[#E6D4BE] text-[#3E2C1E] flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-2.5">
+            <QuokkaFaceBadge className="w-8 h-8 shrink-0" />
+            <h2 className="text-lg font-extrabold tracking-tight">
               {editingExpense ? '✏️ 編輯分帳項目' : '➕ 新增一筆分帳'}
             </h2>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-full hover:bg-white/20 transition"
+            className="p-1.5 rounded-full hover:bg-[#EADBC8]/60 text-[#5C4432] transition"
           >
             <X className="w-5 h-5" />
           </button>
@@ -443,37 +440,40 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
             <button
               type="button"
               onClick={onSwitchToReceiptScanner}
-              className="w-full p-3.5 rounded-2xl bg-gradient-to-r from-indigo-50 via-violet-50 to-fuchsia-50 hover:from-indigo-100 hover:to-fuchsia-100 border border-indigo-200 text-left flex items-center justify-between gap-3 transition shadow-sm"
+              className="w-full p-3.5 rounded-2xl bg-[#FFF6DA] hover:bg-[#FCEEC2] border-2 border-[#E4C77B] text-left flex items-center justify-between gap-3 transition shadow-[0_3px_0_#EAE0D2]"
             >
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0">
-                  <Camera className="w-4 h-4" />
+                <div className="relative shrink-0">
+                  <BoboFaceBadge className="w-9 h-9" />
+                  <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-[#B06D3E] border border-[#3E2C1E] text-[#FFFDF9] flex items-center justify-center">
+                    <Camera className="w-2.5 h-2.5" />
+                  </span>
                 </div>
                 <div>
-                  <div className="text-xs sm:text-sm font-extrabold text-indigo-950">
+                  <div className="text-xs sm:text-sm font-extrabold text-[#3E2C1E]">
                     📷 拍收據 / 菜單自動偵測品項與價錢
                   </div>
-                  <div className="text-[11px] text-slate-600">
+                  <div className="text-[11px] text-[#7A5E3A]">
                     拍完自動列出所有品項 ➜ 逐項勾選是誰的，或勾選對象整筆平分
                   </div>
                 </div>
               </div>
-              <span className="text-xs font-extrabold text-indigo-600 shrink-0">
+              <span className="text-xs font-extrabold text-[#8F4D22] shrink-0">
                 開啟掃描 ➜
               </span>
             </button>
           )}
 
           {errorMsg && (
-            <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm flex items-start gap-2.5">
-              <AlertCircle className="w-5 h-5 shrink-0 mt-0.5 text-rose-500" />
+            <div className="p-3.5 rounded-2xl bg-[#FDF0EE] border-2 border-[#EFC6BF] text-[#A63D32] text-sm font-bold flex items-start gap-2.5">
+              <AlertCircle className="w-5 h-5 shrink-0 mt-0.5 text-[#C85A4B]" />
               <span>{errorMsg}</span>
             </div>
           )}
 
           {/* Category Pills */}
           <div>
-            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+            <label className="block text-xs font-extrabold text-[#7A624E] uppercase tracking-wider mb-2">
               消費分類
             </label>
             <div className="grid grid-cols-4 gap-2">
@@ -487,10 +487,10 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
                       key={catKey}
                       type="button"
                       onClick={() => setCategory(catKey)}
-                      className={`py-2 px-2 rounded-xl text-xs font-medium flex flex-col items-center gap-1 border transition ${
+                      className={`py-2 px-2 rounded-xl text-xs font-bold flex flex-col items-center gap-1 transition ${
                         active
-                          ? 'bg-indigo-50 border-indigo-500 text-indigo-700 shadow-sm'
-                          : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                          ? 'bg-[#FCE394] border-2 border-[#3E2C1E] text-[#3E2C1E] shadow-[0_2px_0_#3E2C1E]'
+                          : 'bg-[#FAF6EE] border border-[#E6D6C3] text-[#6E5643] hover:bg-[#F3E8D8]'
                       }`}
                     >
                       <span className="text-lg">{meta.emoji}</span>
@@ -504,41 +504,41 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
           {/* Title & Date */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="sm:col-span-2">
-              <label className="block text-xs font-semibold text-slate-600 mb-1">
+              <label className="block text-xs font-bold text-[#6E5643] mb-1">
                 項目名稱 *
               </label>
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="例如：一蘭拉麵、Uber 車資、幫買藥妝"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                placeholder="例如：首爾烤肉、Uber 車資、幫買伴手禮"
+                className="w-full px-3.5 py-2.5 text-sm font-semibold cream-input"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1">
+              <label className="block text-xs font-bold text-[#6E5643] mb-1">
                 日期
               </label>
               <input
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                className="w-full px-3 py-2.5 text-sm font-semibold cream-input"
               />
             </div>
           </div>
 
           {/* Currency & Amount & Service Fee */}
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+          <div className="p-4 rounded-2xl bg-[#FAF6EE] border-2 border-[#E6D6C3] space-y-3">
             <div className="grid grid-cols-3 gap-2.5">
               <div>
-                <label className="block text-xs font-semibold text-slate-600 mb-1">
+                <label className="block text-xs font-bold text-[#6E5643] mb-1">
                   消費幣別
                 </label>
                 <select
                   value={currency}
                   onChange={(e) => handleCurrencyChange(e.target.value as CurrencyCode)}
-                  className="w-full px-2.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm font-medium focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full px-2.5 py-2.5 text-sm font-bold cream-input"
                 >
                   {CURRENCY_LIST.map((c) => (
                     <option key={c.code} value={c.code}>
@@ -549,7 +549,7 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
               </div>
 
               <div className="col-span-2">
-                <label className="block text-xs font-semibold text-slate-600 mb-1">
+                <label className="block text-xs font-bold text-[#6E5643] mb-1">
                   金額 ({CURRENCIES[currency].symbol}) *
                 </label>
                 <input
@@ -559,14 +559,14 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
                   value={rawSubtotal}
                   onChange={(e) => setRawSubtotal(e.target.value)}
                   placeholder="輸入消費金額..."
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-base font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full px-3.5 py-2.5 text-base font-extrabold cream-input"
                 />
               </div>
             </div>
 
             {/* Service Fee Quick Pills */}
             <div className="flex items-center justify-between flex-wrap gap-2 pt-1">
-              <span className="text-xs font-medium text-slate-500">
+              <span className="text-xs font-bold text-[#7A624E]">
                 加成計算（服務費 / 消費稅）：
               </span>
               <div className="flex items-center gap-1.5">
@@ -575,10 +575,10 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
                     key={pct}
                     type="button"
                     onClick={() => setServiceFeePercent(pct)}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition ${
+                    className={`px-2.5 py-1 rounded-xl text-xs font-extrabold transition ${
                       serviceFeePercent === pct
-                        ? 'bg-indigo-600 text-white'
-                        : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
+                        ? 'bg-[#B06D3E] text-[#FFFDF9] border border-[#3E2C1E] shadow-[0_1px_0_#3E2C1E]'
+                        : 'bg-[#FFFDF9] border border-[#DFCEB9] text-[#6E5643] hover:bg-[#F3E8D8]'
                     }`}
                   >
                     {pct === 0 ? '不加收' : `+${pct}%`}
@@ -589,36 +589,36 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
 
             {/* Multi-currency Exchange Rate Row */}
             {currency !== group.baseCurrency && (
-              <div className="pt-2 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <div className="flex items-center gap-2 text-xs text-slate-600">
+              <div className="pt-2 border-t border-[#E6D6C3] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div className="flex items-center gap-2 text-xs text-[#6E5643]">
                   <span>匯率設定：1 {currency} =</span>
                   <input
                     type="number"
                     step="any"
                     value={exchangeRate}
                     onChange={(e) => setExchangeRate(e.target.value)}
-                    className="w-24 px-2 py-1 rounded-lg border border-slate-300 bg-white font-semibold text-slate-900"
+                    className="w-24 px-2 py-1 text-xs font-bold cream-input"
                   />
                   <span>{group.baseCurrency}</span>
                   <button
                     type="button"
                     onClick={() => handleCurrencyChange(currency)}
                     title="重設為最新匯率"
-                    className="p-1 text-indigo-600 hover:bg-indigo-50 rounded"
+                    className="p-1 text-[#B06D3E] hover:bg-[#F3E8D8] rounded"
                   >
                     <RefreshCw className="w-3.5 h-3.5" />
                   </button>
                 </div>
-                <div className="text-xs font-bold text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-lg">
+                <div className="text-xs font-extrabold text-[#8F4D22] bg-[#FCE394]/60 border border-[#E5C97B] px-2.5 py-1 rounded-xl">
                   折合 {formatMoney(baseTotal, group.baseCurrency)}
                 </div>
               </div>
             )}
 
             {serviceFeePercent > 0 && (
-              <div className="text-xs text-slate-600 flex justify-between pt-1">
+              <div className="text-xs text-[#6E5643] flex justify-between pt-1">
                 <span>含 +{serviceFeePercent}% 服務費後總計：</span>
-                <span className="font-bold text-slate-900">
+                <span className="font-extrabold text-[#3E2C1E]">
                   {formatMoney(originalTotal, currency)}
                 </span>
               </div>
@@ -626,15 +626,15 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
           </div>
 
           {/* STEP 1: Who Paid (Single vs Multi-Payer) + Exclude Payer Option */}
-          <div className="p-4 rounded-2xl bg-indigo-50/50 border border-indigo-100 space-y-3">
+          <div className="p-4 rounded-2xl bg-[#FDF5E8] border-2 border-[#EAD8C0] space-y-3">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-slate-800">
+              <label className="text-xs font-extrabold text-[#3E2C1E]">
                 1️⃣ 誰先付錢（墊付人）？
               </label>
               <button
                 type="button"
                 onClick={() => setIsMultiPayer(!isMultiPayer)}
-                className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1"
+                className="text-xs font-extrabold text-[#B06D3E] hover:text-[#8F4D22] flex items-center gap-1"
               >
                 <Users className="w-3.5 h-3.5" />
                 {isMultiPayer ? '切換為單人墊付' : '多人湊錢墊付'}
@@ -643,22 +643,23 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
 
             {!isMultiPayer ? (
               <div className="flex flex-wrap gap-2">
-                {group.members.map((m) => {
+                {group.members.map((m, idx) => {
                   const selected = singlePayerId === m.id;
+                  const avatarBg = getCreamyAvatarClass(m.avatarColor, idx);
                   return (
                     <button
                       key={m.id}
                       type="button"
                       onClick={() => handleSelectSinglePayer(m.id)}
-                      className={`px-3.5 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 border transition ${
+                      className={`px-3.5 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition ${
                         selected
-                          ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
-                          : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                          ? 'bg-[#B06D3E] text-[#FFFDF9] border-2 border-[#3E2C1E] shadow-[0_2px_0_#3E2C1E]'
+                          : 'bg-[#FFFDF9] text-[#4A3525] border border-[#E2D0BC] hover:bg-[#FAF6EE]'
                       }`}
                     >
                       <span
                         className={`w-5 h-5 rounded-full text-[11px] flex items-center justify-center text-white font-bold ${
-                          selected ? 'bg-white/25' : m.avatarColor
+                          selected ? 'bg-white/25' : avatarBg
                         }`}
                       >
                         {m.name.slice(0, 1)}
@@ -670,14 +671,14 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
                 })}
               </div>
             ) : (
-              <div className="p-3 rounded-xl bg-white border border-slate-200 space-y-2">
-                <div className="flex justify-between text-xs text-slate-500 mb-1">
+              <div className="p-3 rounded-xl bg-[#FFFDF9] border border-[#E5D5C1] space-y-2">
+                <div className="flex justify-between text-xs text-[#7A624E] mb-1">
                   <span>輸入每位成員先墊付的金額 ({currency})</span>
                   <span
                     className={
                       Math.abs(multiPayerSum - originalTotal) < 0.5
-                        ? 'text-emerald-600 font-bold'
-                        : 'text-rose-600 font-bold'
+                        ? 'text-[#3F7A4D] font-extrabold'
+                        : 'text-[#B94A3E] font-extrabold'
                     }
                   >
                     已填：{formatMoney(multiPayerSum, currency)} /{' '}
@@ -686,7 +687,7 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
                 </div>
                 {group.members.map((m) => (
                   <div key={m.id} className="flex items-center justify-between gap-3">
-                    <span className="text-sm font-medium text-slate-700">{m.name}</span>
+                    <span className="text-sm font-bold text-[#4A3525]">{m.name}</span>
                     <input
                       type="number"
                       step="any"
@@ -696,7 +697,7 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
                         setMultiPayers({ ...multiPayers, [m.id]: e.target.value })
                       }
                       placeholder="0"
-                      className="w-32 px-3 py-1.5 rounded-xl border border-slate-300 bg-white text-sm text-right font-semibold"
+                      className="w-32 px-3 py-1.5 text-sm text-right font-bold cream-input"
                     />
                   </div>
                 ))}
@@ -704,15 +705,15 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
             )}
 
             {/* One-tap checkbox: Payer does NOT participate in splitting */}
-            <label className="flex items-center gap-2.5 pt-2 border-t border-indigo-100 cursor-pointer select-none">
+            <label className="flex items-center gap-2.5 pt-2 border-t border-[#EAD8C0] cursor-pointer select-none">
               <input
                 type="checkbox"
                 checked={excludePayerFromSplit}
                 onChange={(e) => handleToggleExcludePayer(e.target.checked)}
-                className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500"
+                className="w-4 h-4 rounded accent-[#B06D3E]"
               />
-              <span className="text-xs font-bold text-indigo-900 flex items-center gap-1">
-                <UserMinus className="w-3.5 h-3.5 text-indigo-600" />
+              <span className="text-xs font-extrabold text-[#5C4432] flex items-center gap-1">
+                <UserMinus className="w-3.5 h-3.5 text-[#B06D3E]" />
                 先付錢的人不參與這筆分攤（純幫別人代墊 / 請客反扣）
               </span>
             </label>
@@ -722,11 +723,11 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
           <div className="space-y-3">
             <div className="flex items-center justify-between flex-wrap gap-2">
               <div>
-                <label className="text-xs font-bold text-slate-800">
+                <label className="text-xs font-extrabold text-[#3E2C1E]">
                   2️⃣ 勾選誰要負擔這筆錢？（已勾選 {activeParticipantCount} /{' '}
                   {group.members.length} 人）
                 </label>
-                <p className="text-[11px] text-slate-500">
+                <p className="text-[11px] text-[#7A624E]">
                   直接點選下方成員即可打勾/取消勾選，只由有打勾的人分攤！
                 </p>
               </div>
@@ -744,14 +745,14 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
                       handleSplitModeChange(splitMode);
                     }
                   }}
-                  className="px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold transition"
+                  className="px-2.5 py-1 rounded-xl bg-[#F6E8D5] hover:bg-[#EED9BF] text-[#7A441F] text-xs font-extrabold transition"
                 >
                   全員平分
                 </button>
                 <button
                   type="button"
                   onClick={() => handleToggleExcludePayer(true)}
-                  className="px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 text-xs font-bold transition"
+                  className="px-2.5 py-1 rounded-xl bg-[#FCE394]/70 hover:bg-[#FCE394] text-[#4A3525] text-xs font-extrabold transition"
                 >
                   排除墊付人
                 </button>
@@ -762,7 +763,7 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
                     group.members.forEach((m) => (next[m.id] = 0));
                     setSplitValues(next);
                   }}
-                  className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold transition"
+                  className="px-2.5 py-1 rounded-xl bg-[#EFE6DA] hover:bg-[#E5D8C7] text-[#6E5643] text-xs font-bold transition"
                 >
                   全部取消
                 </button>
@@ -770,7 +771,7 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
             </div>
 
             {/* Split Mode Tabs */}
-            <div className="grid grid-cols-4 gap-1.5 p-1 bg-slate-100 rounded-2xl">
+            <div className="grid grid-cols-4 gap-1.5 p-1.5 bg-[#F4ECE0] border border-[#E5D5C1] rounded-2xl">
               {(
                 [
                   { key: 'equal', label: '勾選平分' },
@@ -783,10 +784,10 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
                   key={tab.key}
                   type="button"
                   onClick={() => handleSplitModeChange(tab.key)}
-                  className={`py-2 rounded-xl text-xs font-bold transition ${
+                  className={`py-2 rounded-xl text-xs font-extrabold transition ${
                     splitMode === tab.key
-                      ? 'bg-white text-indigo-600 shadow-sm'
-                      : 'text-slate-600 hover:text-slate-900'
+                      ? 'bg-[#FFFDF9] text-[#8F4D22] border-2 border-[#3E2C1E] shadow-[0_2px_0_#3E2C1E]'
+                      : 'text-[#7A624E] hover:text-[#3E2C1E]'
                   }`}
                 >
                   {tab.label}
@@ -796,11 +797,11 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
 
             {/* Live Per-Person Summary Banner for Equal Split */}
             {splitMode === 'equal' && activeParticipantCount > 0 && (
-              <div className="px-3.5 py-2 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between text-xs">
-                <span className="font-semibold text-emerald-900">
+              <div className="px-3.5 py-2 rounded-xl bg-[#EAF4EC] border border-[#BDDAC3] flex items-center justify-between text-xs">
+                <span className="font-bold text-[#356340]">
                   ✅ 由已勾選的 {activeParticipantCount} 人平分：
                 </span>
-                <span className="font-extrabold text-emerald-700">
+                <span className="font-extrabold text-[#2B5936]">
                   每人 {formatMoney(originalTotal / activeParticipantCount, currency)}
                   {currency !== group.baseCurrency &&
                     ` (≈ ${formatMoney(
@@ -813,13 +814,13 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
 
             {/* Validation Status Strip for Exact */}
             {splitMode === 'exact' && (
-              <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-indigo-50/70 text-xs">
-                <span className="text-slate-600">目前分配總額：</span>
+              <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-[#FDF5E8] border border-[#EAD8C0] text-xs">
+                <span className="text-[#6E5643] font-semibold">目前分配總額：</span>
                 <span
                   className={
                     Math.abs(splitSum - originalTotal) < 0.5
-                      ? 'text-emerald-600 font-bold'
-                      : 'text-rose-600 font-bold'
+                      ? 'text-[#3F7A4D] font-extrabold'
+                      : 'text-[#B94A3E] font-extrabold'
                   }
                 >
                   {formatMoney(splitSum, currency)} / {formatMoney(originalTotal, currency)}
@@ -830,13 +831,14 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
             )}
 
             {/* Member Split Checkbox List */}
-            <div className="divide-y divide-slate-100 border border-slate-200 rounded-2xl overflow-hidden bg-white">
-              {group.members.map((m) => {
+            <div className="divide-y divide-[#EFE4D4] border-2 border-[#E5D5C1] rounded-2xl overflow-hidden bg-[#FFFDF9]">
+              {group.members.map((m, idx) => {
                 const splitEntry = computedSplits.find((s) => s.memberId === m.id);
                 const calcAmt = splitEntry?.calculatedAmount || 0;
                 const val = splitValues[m.id] ?? 0;
                 const isChecked = val > 0;
                 const isPayer = currentPayerIds.includes(m.id);
+                const avatarBg = getCreamyAvatarClass(m.avatarColor, idx);
 
                 return (
                   <div
@@ -850,8 +852,8 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
                       splitMode === 'equal' ? 'cursor-pointer' : ''
                     } ${
                       isChecked
-                        ? 'bg-white hover:bg-indigo-50/40'
-                        : 'bg-slate-50/70 opacity-65 hover:opacity-90'
+                        ? 'bg-[#FFFDF9] hover:bg-[#FAF6EE]'
+                        : 'bg-[#FAF6EE]/70 opacity-65 hover:opacity-90'
                     }`}
                   >
                     {/* Left: Checkbox + Avatar + Name + Share Preview */}
@@ -865,36 +867,36 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
                         aria-label={`勾選 ${m.name} 是否參與分攤`}
                         className={`p-1 rounded-lg transition ${
                           isChecked
-                            ? 'text-indigo-600 hover:bg-indigo-50'
-                            : 'text-slate-400 hover:bg-slate-200/60'
+                            ? 'text-[#B06D3E] hover:bg-[#F5E9D8]'
+                            : 'text-[#B39B86] hover:bg-[#EFE4D4]'
                         }`}
                       >
                         {isChecked ? (
-                          <CheckSquare className="w-5 h-5 fill-indigo-600 text-white" />
+                          <CheckSquare className="w-5 h-5 fill-[#B06D3E] text-[#FFFDF9]" />
                         ) : (
                           <Square className="w-5 h-5" />
                         )}
                       </button>
 
                       <div
-                        className={`w-7 h-7 rounded-full ${m.avatarColor} text-white text-xs font-bold flex items-center justify-center shrink-0`}
+                        className={`w-7 h-7 rounded-full ${avatarBg} border border-[#3E2C1E]/30 text-white text-xs font-bold flex items-center justify-center shrink-0`}
                       >
                         {m.name.slice(0, 1)}
                       </div>
                       <div className="truncate">
                         <div className="flex items-center gap-1.5">
-                          <span className="text-sm font-bold text-slate-800 truncate">
+                          <span className="text-sm font-extrabold text-[#3E2C1E] truncate">
                             {m.name}
                           </span>
                           {isPayer && (
-                            <span className="px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700 text-[10px] font-bold">
+                            <span className="px-1.5 py-0.5 rounded-md bg-[#FCE394] border border-[#D8B962] text-[#4A3525] text-[10px] font-extrabold">
                               先墊付
                             </span>
                           )}
                         </div>
-                        <div className="text-[11px] text-slate-500">
+                        <div className="text-[11px] text-[#7A624E]">
                           {isChecked ? (
-                            <span className="text-indigo-700 font-semibold">
+                            <span className="text-[#8F4D22] font-bold">
                               應負擔：{formatMoney(calcAmt, currency)}
                               {currency !== group.baseCurrency &&
                                 ` (≈ ${formatMoney(
@@ -903,7 +905,7 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
                                 )})`}
                             </span>
                           ) : (
-                            <span className="text-slate-400">不參與此筆分攤 ($0)</span>
+                            <span className="text-[#A8927E]">不參與此筆分攤 ($0)</span>
                           )}
                         </div>
                       </div>
@@ -912,10 +914,10 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
                     {/* Right: Mode-specific Controls */}
                     {splitMode === 'equal' && (
                       <span
-                        className={`px-3 py-1 rounded-xl text-xs font-bold flex items-center gap-1 transition ${
+                        className={`px-3 py-1 rounded-xl text-xs font-extrabold flex items-center gap-1 transition ${
                           isChecked
-                            ? 'bg-emerald-100 text-emerald-700 border border-emerald-300'
-                            : 'bg-slate-200/70 text-slate-500'
+                            ? 'bg-[#EAF4EC] text-[#356340] border border-[#BDDAC3]'
+                            : 'bg-[#EFE6DA] text-[#8C735D]'
                         }`}
                       >
                         {isChecked ? '✓ 分攤' : '不參與'}
@@ -927,7 +929,7 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
                         className="flex items-center gap-1.5"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <span className="text-xs text-slate-400">
+                        <span className="text-xs font-bold text-[#8C735D]">
                           {CURRENCIES[currency].symbol}
                         </span>
                         <input
@@ -942,7 +944,7 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
                             })
                           }
                           placeholder="0"
-                          className="w-28 px-2.5 py-1.5 rounded-xl border border-slate-300 bg-white text-sm text-right font-bold"
+                          className="w-28 px-2.5 py-1.5 text-sm text-right font-extrabold cream-input"
                         />
                       </div>
                     )}
@@ -960,11 +962,11 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
                               [m.id]: Math.max(0, Number((val - 0.5).toFixed(1))),
                             })
                           }
-                          className="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold"
+                          className="w-7 h-7 rounded-lg bg-[#EFE6DA] hover:bg-[#E5D8C7] text-[#4A3525] font-extrabold"
                         >
                           -
                         </button>
-                        <span className="w-14 text-center text-xs font-bold text-indigo-700">
+                        <span className="w-14 text-center text-xs font-extrabold text-[#8F4D22]">
                           {val} 份
                         </span>
                         <button
@@ -975,7 +977,7 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
                               [m.id]: Number((val + 0.5).toFixed(1)),
                             })
                           }
-                          className="w-7 h-7 rounded-lg bg-indigo-100 hover:bg-indigo-200 text-indigo-700 font-bold"
+                          className="w-7 h-7 rounded-lg bg-[#FCE394] hover:bg-[#F8D872] border border-[#3E2C1E] text-[#3E2C1E] font-extrabold"
                         >
                           +
                         </button>
@@ -1000,9 +1002,9 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
                             })
                           }
                           placeholder="0"
-                          className="w-20 px-2.5 py-1.5 rounded-xl border border-slate-300 bg-white text-sm text-right font-bold"
+                          className="w-20 px-2.5 py-1.5 text-sm text-right font-extrabold cream-input"
                         />
-                        <span className="text-xs font-semibold text-slate-500">%</span>
+                        <span className="text-xs font-bold text-[#7A624E]">%</span>
                       </div>
                     )}
                   </div>
@@ -1013,7 +1015,7 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
 
           {/* Note */}
           <div>
-            <label className="block text-xs font-semibold text-slate-600 mb-1">
+            <label className="block text-xs font-bold text-[#6E5643] mb-1">
               備註（選填）
             </label>
             <input
@@ -1021,7 +1023,7 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder="例如：Mona 幫忙代買藥妝、Alice 不喝酒不攤酒錢..."
-              className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+              className="w-full px-3.5 py-2 text-sm cream-input"
             />
           </div>
 
@@ -1030,13 +1032,13 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-3 rounded-2xl border border-slate-300 text-slate-700 font-semibold text-sm hover:bg-slate-50 transition"
+              className="flex-1 py-3 rounded-2xl font-bold text-sm btn-bobo"
             >
               取消
             </button>
             <button
               type="submit"
-              className="flex-[2] py-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold text-sm shadow-lg shadow-indigo-500/25 hover:opacity-95 transition flex items-center justify-center gap-1.5"
+              className="flex-[2] py-3 rounded-2xl font-extrabold text-sm flex items-center justify-center gap-1.5 btn-quokka"
             >
               <Sparkles className="w-4 h-4" />
               {editingExpense ? '儲存修改' : '確認新增帳目'}

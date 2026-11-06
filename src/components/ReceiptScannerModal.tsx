@@ -35,6 +35,7 @@ import {
   recognizeReceiptImage,
   saveGeminiApiKey,
 } from '../utils/receiptOcr';
+import { QuokkaEmptyReceiptArt, QuokkaFaceBadge } from './QuokkaBoboArt';
 
 interface ReceiptScannerModalProps {
   isOpen: boolean;
@@ -160,12 +161,10 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
             quantity: it.quantity || 1,
             amount: it.amount,
             selected: true,
-            // Default: all members checked so user can either uncheck or tap a single person
             assignedMemberIds: [...allMemberIds],
           }))
         );
       } else {
-        // Provide 2 editable blank rows if OCR couldn't confidently parse structured lines
         setItems([
           {
             id: `rcpt-item-${Date.now()}-0`,
@@ -332,7 +331,6 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
       return map;
     }
 
-    // Itemized mode: calculate each item's exact split (with penny remainder fairness + service fee)
     const feeMultiplier = 1 + serviceFeePercent / 100;
     for (const item of selectedItems) {
       if (item.assignedMemberIds.length === 0) continue;
@@ -348,7 +346,6 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
       });
     }
 
-    // Reconcile any rounding penny difference so sum(memberTotals) === grandTotal
     const assignedSum = Object.values(map).reduce((s, v) => s + v, 0);
     const diff = Number((grandTotal - assignedSum).toFixed(2));
     if (Math.abs(diff) > 0 && Math.abs(diff) <= 0.5) {
@@ -419,7 +416,6 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
       return;
     }
 
-    // Itemized mode validation: every selected item must have >= 1 assigned member
     const unassignedItem = selectedItems.find(
       (it) => it.assignedMemberIds.length === 0
     );
@@ -466,7 +462,6 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
       return;
     }
 
-    // Combined 1 expense with exact per-member itemized totals
     const splits = group.members.map((m) => ({
       memberId: m.id,
       value: memberTotals[m.id] || 0,
@@ -506,17 +501,17 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-900/65 backdrop-blur-sm p-0 sm:p-4 overflow-y-auto">
-      <div className="bg-white w-full max-w-2xl rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[94vh]">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-[#3E2C1E]/45 backdrop-blur-sm p-0 sm:p-4 overflow-y-auto">
+      <div className="bg-[#FFFDF9] w-full max-w-2xl rounded-t-3xl sm:rounded-3xl border-2 border-[#3E2C1E] shadow-[0_8px_0_#3E2C1E] overflow-hidden flex flex-col max-h-[94vh]">
         {/* Header */}
-        <div className="px-5 py-4 bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-600 text-white flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-2">
-            <Camera className="w-5 h-5" />
+        <div className="px-5 py-4 bg-[#FAF1E2] border-b-2 border-[#E6D4BE] text-[#3E2C1E] flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-2.5">
+            <QuokkaFaceBadge className="w-9 h-9 shrink-0" />
             <div>
-              <h2 className="text-base sm:text-lg font-extrabold leading-tight">
+              <h2 className="text-base sm:text-lg font-extrabold leading-tight tracking-tight">
                 📷 拍收據 / 菜單自動偵測品項分帳
               </h2>
-              <p className="text-[11px] text-indigo-100">
+              <p className="text-[11px] text-[#7A624E]">
                 自動辨識所有品項與價錢 ➜ 自由勾選哪道是誰吃的，或整筆勾選平分對象
               </p>
             </div>
@@ -524,7 +519,7 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-full hover:bg-white/20 transition"
+            className="p-1.5 rounded-full hover:bg-[#EADBC8]/60 text-[#5C4432] transition"
           >
             <X className="w-5 h-5" />
           </button>
@@ -550,22 +545,22 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
         {/* Body */}
         <div className="p-5 overflow-y-auto space-y-4 flex-1">
           {errorMsg && (
-            <div className="p-3 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-medium flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" />
+            <div className="p-3 rounded-2xl bg-[#FFF6DA] border-2 border-[#E5C97B] text-[#6E4F1D] text-xs font-bold flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-[#B06D3E]" />
               <span>{errorMsg}</span>
             </div>
           )}
 
           {/* AI Vision Mode Bar */}
-          <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col gap-2">
+          <div className="p-3 rounded-2xl bg-[#FAF6EE] border border-[#E6D6C3] flex flex-col gap-2">
             <div className="flex items-center justify-between gap-2 flex-wrap">
               <div className="flex items-center gap-1.5 text-xs">
                 <Sparkles
                   className={`w-4 h-4 ${
-                    hasSavedAiKey ? 'text-violet-600' : 'text-slate-400'
+                    hasSavedAiKey ? 'text-[#B06D3E]' : 'text-[#A8927E]'
                   }`}
                 />
-                <span className="font-bold text-slate-800">
+                <span className="font-extrabold text-[#3E2C1E]">
                   {hasSavedAiKey
                     ? '✨ 已啟用 Gemini AI 智慧視覺超精準辨識'
                     : '🔍 目前使用：內建免設定 OCR 辨識引擎'}
@@ -574,7 +569,7 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
               <button
                 type="button"
                 onClick={() => setShowAiKeyPanel((v) => !v)}
-                className="text-[11px] font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1"
+                className="text-[11px] font-extrabold text-[#B06D3E] hover:text-[#8F4D22] flex items-center gap-1"
               >
                 <KeyRound className="w-3.5 h-3.5" />
                 <span>{hasSavedAiKey ? '修改 AI 金鑰' : '升級 AI 超精準辨識 (選填)'}</span>
@@ -582,8 +577,8 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
             </div>
 
             {showAiKeyPanel && (
-              <div className="pt-2 border-t border-slate-200 space-y-2">
-                <p className="text-[11px] text-slate-500 leading-relaxed">
+              <div className="pt-2 border-t border-[#E6D6C3] space-y-2">
+                <p className="text-[11px] text-[#7A624E] leading-relaxed">
                   貼上免費的 Google AI Studio <code>Gemini API Key</code>（僅儲存在妳這台裝置瀏覽器本機，不會上傳至公開程式碼），即可秒速精準辨識歪斜熱感紙收據、手寫單與日韓文菜單！留空則使用內建免費 OCR。
                 </p>
                 <div className="flex items-center gap-2">
@@ -592,12 +587,12 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
                     value={geminiKeyInput}
                     onChange={(e) => setGeminiKeyInput(e.target.value)}
                     placeholder="貼上 AIza... 開頭的 Gemini API Key（可留空）"
-                    className="flex-1 px-3 py-1.5 rounded-xl border border-slate-300 text-xs outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="flex-1 px-3 py-1.5 text-xs cream-input"
                   />
                   <button
                     type="button"
                     onClick={handleSaveAiKey}
-                    className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition"
+                    className="px-3.5 py-1.5 rounded-xl text-xs font-extrabold btn-quokka"
                   >
                     儲存
                   </button>
@@ -608,16 +603,14 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
 
           {/* Step 1: Capture / Upload Buttons */}
           {!previewUrl && !isScanning && items.length === 0 && (
-            <div className="p-6 rounded-3xl border-2 border-dashed border-indigo-200 bg-indigo-50/40 text-center space-y-4">
-              <div className="w-14 h-14 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center mx-auto">
-                <Receipt className="w-7 h-7" />
-              </div>
+            <div className="p-6 rounded-3xl border-2 border-dashed border-[#D6B899] bg-[#FDF8F0] text-center space-y-4">
+              <QuokkaEmptyReceiptArt className="w-36 h-24 mx-auto" />
               <div className="space-y-1">
-                <h3 className="text-sm sm:text-base font-extrabold text-slate-900">
+                <h3 className="text-sm sm:text-base font-extrabold text-[#3E2C1E]">
                   拍下收據、發票明細或點餐單
                 </h3>
-                <p className="text-xs text-slate-500">
-                  支援餐廳結帳單、台灣電子發票明細、外送截圖、日本超市/居酒屋收據
+                <p className="text-xs text-[#7A624E]">
+                  支援餐廳結帳單、台灣電子發票明細、外送截圖、日韓超市/咖啡廳收據
                 </p>
               </div>
 
@@ -625,7 +618,7 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
                 <button
                   type="button"
                   onClick={() => cameraInputRef.current?.click()}
-                  className="py-3.5 px-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:opacity-95 text-white font-bold text-sm shadow-md flex items-center justify-center gap-2 transition"
+                  className="py-3.5 px-4 rounded-2xl font-extrabold text-sm flex items-center justify-center gap-2 btn-quokka"
                 >
                   <Camera className="w-4 h-4" />
                   <span>📷 直接拍照掃描</span>
@@ -633,9 +626,9 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
                 <button
                   type="button"
                   onClick={() => galleryInputRef.current?.click()}
-                  className="py-3.5 px-4 rounded-2xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 font-bold text-sm shadow-sm flex items-center justify-center gap-2 transition"
+                  className="py-3.5 px-4 rounded-2xl font-extrabold text-sm flex items-center justify-center gap-2 btn-bobo"
                 >
-                  <ImageIcon className="w-4 h-4 text-indigo-600" />
+                  <ImageIcon className="w-4 h-4 text-[#B06D3E]" />
                   <span>🖼️ 從相簿選照片 / 截圖</span>
                 </button>
               </div>
@@ -643,7 +636,7 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
               <button
                 type="button"
                 onClick={handleAddBlankItem}
-                className="text-xs font-semibold text-slate-500 hover:text-indigo-600 underline"
+                className="text-xs font-bold text-[#8C735D] hover:text-[#B06D3E] underline"
               >
                 沒有照片？直接手動逐項輸入品項分帳
               </button>
@@ -652,12 +645,12 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
 
           {/* Scanning Progress */}
           {isScanning && (
-            <div className="p-6 rounded-3xl bg-indigo-50 border border-indigo-100 text-center space-y-3">
-              <Loader2 className="w-8 h-8 text-indigo-600 animate-spin mx-auto" />
-              <div className="text-sm font-bold text-indigo-950">{scanStatus}</div>
-              <div className="w-full h-2.5 bg-indigo-100 rounded-full overflow-hidden">
+            <div className="p-6 rounded-3xl bg-[#FFF7E2] border-2 border-[#EAD084] text-center space-y-3">
+              <Loader2 className="w-8 h-8 text-[#B06D3E] animate-spin mx-auto" />
+              <div className="text-sm font-extrabold text-[#3E2C1E]">{scanStatus}</div>
+              <div className="w-full h-2.5 bg-[#F2E4C6] rounded-full overflow-hidden border border-[#DEC799]">
                 <div
-                  className="h-full bg-gradient-to-r from-indigo-600 to-violet-600 transition-all duration-300"
+                  className="h-full bg-gradient-to-r from-[#B06D3E] to-[#E8B84B] transition-all duration-300"
                   style={{ width: `${Math.max(8, Math.round(scanProgress * 100))}%` }}
                 />
               </div>
@@ -668,27 +661,27 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
           {!isScanning && (previewUrl || items.length > 0) && (
             <div className="space-y-4">
               {/* Top Receipt Summary & Re-upload */}
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3 flex-wrap">
+              <div className="p-3.5 rounded-2xl bg-[#FAF6EE] border border-[#E6D6C3] flex items-center justify-between gap-3 flex-wrap">
                 <div className="flex items-center gap-3">
                   {previewUrl && (
                     <img
                       src={previewUrl}
                       alt="收據預覽"
-                      className="w-12 h-12 rounded-xl object-cover border border-slate-300 shrink-0"
+                      className="w-12 h-12 rounded-xl object-cover border-2 border-[#3E2C1E] shrink-0"
                     />
                   )}
                   <div>
                     <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-extrabold text-slate-900">
+                      <span className="text-xs font-extrabold text-[#3E2C1E]">
                         共偵測到 {items.length} 個品項
                       </span>
                       {usedEngine && (
-                        <span className="px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 text-[10px] font-bold">
+                        <span className="px-2 py-0.5 rounded-full bg-[#FCE394] border border-[#D8B962] text-[#4A3525] text-[10px] font-extrabold">
                           {usedEngine === 'gemini-vision' ? '✨ AI 視覺' : '🔍 本機 OCR'}
                         </span>
                       )}
                     </div>
-                    <p className="text-[11px] text-slate-500">
+                    <p className="text-[11px] text-[#7A624E]">
                       品項名稱或價錢若有誤差可直接點擊數字修改
                     </p>
                   </div>
@@ -698,45 +691,45 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
                   <button
                     type="button"
                     onClick={() => cameraInputRef.current?.click()}
-                    className="px-2.5 py-1.5 rounded-xl bg-white border border-slate-300 hover:bg-slate-100 text-xs font-bold text-slate-700 flex items-center gap-1"
+                    className="px-2.5 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1 btn-bobo"
                   >
-                    <Camera className="w-3.5 h-3.5" />
+                    <Camera className="w-3.5 h-3.5 text-[#B06D3E]" />
                     重拍
                   </button>
                   <button
                     type="button"
                     onClick={() => galleryInputRef.current?.click()}
-                    className="px-2.5 py-1.5 rounded-xl bg-white border border-slate-300 hover:bg-slate-100 text-xs font-bold text-slate-700 flex items-center gap-1"
+                    className="px-2.5 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1 btn-bobo"
                   >
-                    <ImageIcon className="w-3.5 h-3.5" />
+                    <ImageIcon className="w-3.5 h-3.5 text-[#B06D3E]" />
                     換圖
                   </button>
                 </div>
               </div>
 
-              {/* Store Title, Category, Currency, Service Fee & Payer */}
+              {/* Store Title, Category, Currency */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                 <div className="sm:col-span-2">
-                  <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                  <label className="block text-[11px] font-bold text-[#6E5643] mb-1">
                     帳目 / 店家名稱
                   </label>
                   <input
                     type="text"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    placeholder="例如：居酒屋晚餐、超市採買"
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm font-semibold outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="例如：咖啡廳下午茶、居酒屋晚餐"
+                    className="w-full px-3 py-2 text-sm font-bold cream-input"
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-600 mb-1">
-                    幣別 & 類別
+                  <label className="block text-[11px] font-bold text-[#6E5643] mb-1">
+                    幣別 &amp; 類別
                   </label>
                   <div className="flex gap-1.5">
                     <select
                       value={currency}
                       onChange={(e) => setCurrency(e.target.value as CurrencyCode)}
-                      className="w-1/2 px-2 py-2 rounded-xl border border-slate-300 text-xs font-bold bg-white"
+                      className="w-1/2 px-2 py-2 text-xs font-extrabold cream-input"
                     >
                       {CURRENCY_LIST.map((c) => (
                         <option key={c.code} value={c.code}>
@@ -747,7 +740,7 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
                     <select
                       value={category}
                       onChange={(e) => setCategory(e.target.value as ExpenseCategory)}
-                      className="w-1/2 px-2 py-2 rounded-xl border border-slate-300 text-xs font-bold bg-white"
+                      className="w-1/2 px-2 py-2 text-xs font-extrabold cream-input"
                     >
                       {(Object.keys(CATEGORY_META) as ExpenseCategory[])
                         .filter((k) => k !== 'settlement')
@@ -762,13 +755,13 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
               </div>
 
               {/* Who Paid + Service Fee */}
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
+              <div className="p-3.5 rounded-2xl bg-[#FDF5E8] border-2 border-[#EAD8C0] space-y-2.5">
                 <div className="flex items-center justify-between flex-wrap gap-2">
-                  <span className="text-xs font-bold text-slate-700">
+                  <span className="text-xs font-extrabold text-[#3E2C1E]">
                     💳 這張單由誰先刷卡/付現墊付？
                   </span>
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[11px] font-semibold text-slate-500">
+                    <span className="text-[11px] font-bold text-[#7A624E]">
                       服務費：
                     </span>
                     {[0, 10].map((pct) => (
@@ -776,10 +769,10 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
                         key={pct}
                         type="button"
                         onClick={() => setServiceFeePercent(pct)}
-                        className={`px-2.5 py-0.5 rounded-lg text-xs font-bold transition ${
+                        className={`px-2.5 py-0.5 rounded-lg text-xs font-extrabold transition ${
                           serviceFeePercent === pct
-                            ? 'bg-indigo-600 text-white'
-                            : 'bg-white border border-slate-300 text-slate-600'
+                            ? 'bg-[#B06D3E] text-[#FFFDF9] border border-[#3E2C1E]'
+                            : 'bg-[#FFFDF9] border border-[#DFCEB9] text-[#6E5643]'
                         }`}
                       >
                         {pct === 0 ? '無 (0%)' : '+10%'}
@@ -805,10 +798,10 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
                             );
                           }
                         }}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 border transition ${
+                        className={`px-3 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition ${
                           active
-                            ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
-                            : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                            ? 'bg-[#B06D3E] text-[#FFFDF9] border-2 border-[#3E2C1E] shadow-[0_2px_0_#3E2C1E]'
+                            : 'bg-[#FFFDF9] text-[#4A3525] border border-[#E2D0BC] hover:bg-[#FAF6EE]'
                         }`}
                       >
                         <span>{m.name}</span>
@@ -819,19 +812,19 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
                 </div>
               </div>
 
-              {/* Split Mode Switcher: 逐項勾選是誰的 vs 整筆平分勾選對象 */}
+              {/* Split Mode Switcher */}
               <div className="space-y-2">
-                <label className="block text-xs font-extrabold text-slate-800">
+                <label className="block text-xs font-extrabold text-[#3E2C1E]">
                   🎯 選擇分攤方式：
                 </label>
-                <div className="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-2xl">
+                <div className="grid grid-cols-2 gap-2 p-1.5 bg-[#F4ECE0] border border-[#E5D5C1] rounded-2xl">
                   <button
                     type="button"
                     onClick={() => setAssignMode('itemized')}
                     className={`py-2.5 px-3 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition ${
                       assignMode === 'itemized'
-                        ? 'bg-white text-indigo-600 shadow-sm'
-                        : 'text-slate-600 hover:text-slate-900'
+                        ? 'bg-[#FFFDF9] text-[#8F4D22] border-2 border-[#3E2C1E] shadow-[0_2px_0_#3E2C1E]'
+                        : 'text-[#7A624E] hover:text-[#3E2C1E]'
                     }`}
                   >
                     <Receipt className="w-3.5 h-3.5" />
@@ -842,8 +835,8 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
                     onClick={() => setAssignMode('whole_equal')}
                     className={`py-2.5 px-3 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition ${
                       assignMode === 'whole_equal'
-                        ? 'bg-white text-indigo-600 shadow-sm'
-                        : 'text-slate-600 hover:text-slate-900'
+                        ? 'bg-[#FFFDF9] text-[#8F4D22] border-2 border-[#3E2C1E] shadow-[0_2px_0_#3E2C1E]'
+                        : 'text-[#7A624E] hover:text-[#3E2C1E]'
                     }`}
                   >
                     <Users className="w-3.5 h-3.5" />
@@ -855,14 +848,14 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
               {/* Detected Items List */}
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-extrabold text-slate-800">
+                  <span className="text-xs font-extrabold text-[#3E2C1E]">
                     📋 品項與價錢清單（共勾選 {selectedItems.length} 項，小計{' '}
                     {formatMoney(itemsSubtotal, currency)}）
                   </span>
                   <button
                     type="button"
                     onClick={handleAddBlankItem}
-                    className="px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold flex items-center gap-1 transition"
+                    className="px-2.5 py-1 rounded-xl bg-[#FCE394]/80 hover:bg-[#FCE394] border border-[#3E2C1E] text-[#3E2C1E] text-xs font-extrabold flex items-center gap-1 transition"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     新增品項
@@ -878,10 +871,10 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
                     return (
                       <div
                         key={item.id}
-                        className={`p-3 rounded-2xl border transition space-y-2.5 ${
+                        className={`p-3 rounded-2xl border-2 transition space-y-2.5 ${
                           item.selected
-                            ? 'bg-white border-slate-200 shadow-sm'
-                            : 'bg-slate-50 border-slate-200 opacity-55'
+                            ? 'bg-[#FFFDF9] border-[#E5D5C1] shadow-[0_2px_0_#EAE0D2]'
+                            : 'bg-[#FAF6EE] border-[#EAE0D2] opacity-55'
                         }`}
                       >
                         {/* Item Row: Checkbox + Name + Price + Delete */}
@@ -891,13 +884,13 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
                             onClick={() =>
                               handleUpdateItem(item.id, { selected: !item.selected })
                             }
-                            className="text-indigo-600 shrink-0"
+                            className="text-[#B06D3E] shrink-0"
                             title={item.selected ? '取消計入此品項' : '計入此品項'}
                           >
                             {item.selected ? (
                               <CheckSquare className="w-5 h-5" />
                             ) : (
-                              <Square className="w-5 h-5 text-slate-400" />
+                              <Square className="w-5 h-5 text-[#B39B86]" />
                             )}
                           </button>
 
@@ -908,7 +901,7 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
                               handleUpdateItem(item.id, { name: e.target.value })
                             }
                             placeholder="品項名稱"
-                            className="flex-1 min-w-0 px-2.5 py-1.5 rounded-xl border border-slate-200 text-sm font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500 outline-none"
+                            className="flex-1 min-w-0 px-2.5 py-1.5 text-sm font-bold cream-input"
                           />
 
                           <div className="relative w-28 shrink-0">
@@ -923,23 +916,23 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
                                 })
                               }
                               placeholder="價錢"
-                              className="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 text-right text-sm font-extrabold text-indigo-700 focus:ring-2 focus:ring-indigo-500 outline-none"
+                              className="w-full px-2.5 py-1.5 text-right text-sm font-extrabold text-[#8F4D22] cream-input"
                             />
                           </div>
 
                           <button
                             type="button"
                             onClick={() => handleRemoveItem(item.id)}
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition shrink-0"
+                            className="p-1.5 rounded-lg text-[#A8927E] hover:text-[#B94A3E] hover:bg-[#FDF0EE] transition shrink-0"
                             title="移除此列"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
 
-                        {/* Member Assignment Chips (Shown when assignMode === 'itemized' and item is selected) */}
+                        {/* Member Assignment Chips */}
                         {assignMode === 'itemized' && item.selected && (
-                          <div className="pt-1.5 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
+                          <div className="pt-1.5 border-t border-[#EFE4D4] flex flex-wrap items-center justify-between gap-2">
                             <div className="flex flex-wrap items-center gap-1.5">
                               {group.members.map((m) => {
                                 const checked = item.assignedMemberIds.includes(m.id);
@@ -951,10 +944,10 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
                                     onDoubleClick={() =>
                                       handleSelectOnlyMemberForItem(item.id, m.id)
                                     }
-                                    className={`px-2.5 py-1 rounded-xl text-xs font-bold flex items-center gap-1 border transition ${
+                                    className={`px-2.5 py-1 rounded-xl text-xs font-extrabold flex items-center gap-1 transition ${
                                       checked
-                                        ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
-                                        : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                                        ? 'bg-[#B06D3E] text-[#FFFDF9] border border-[#3E2C1E] shadow-[0_1px_0_#3E2C1E]'
+                                        : 'bg-[#FAF6EE] text-[#6E5643] border border-[#E2D0BC] hover:bg-[#F3E8D8]'
                                     }`}
                                   >
                                     {checked ? (
@@ -974,7 +967,7 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
                                     ? handleClearMembersForItem(item.id)
                                     : handleSelectAllMembersForItem(item.id)
                                 }
-                                className="px-2 py-1 rounded-lg text-[11px] font-semibold text-indigo-600 hover:bg-indigo-50"
+                                className="px-2 py-1 rounded-lg text-[11px] font-extrabold text-[#B06D3E] hover:bg-[#F5E9D8]"
                               >
                                 {item.assignedMemberIds.length === group.members.length
                                   ? '全不選'
@@ -982,9 +975,9 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
                               </button>
                             </div>
 
-                            <span className="text-[11px] font-bold text-slate-500">
+                            <span className="text-[11px] font-bold text-[#7A624E]">
                               {item.assignedMemberIds.length === 0 ? (
-                                <span className="text-rose-600">請勾選分攤人</span>
+                                <span className="text-[#B94A3E]">請勾選分攤人</span>
                               ) : item.assignedMemberIds.length === 1 ? (
                                 `${
                                   group.members.find(
@@ -1008,9 +1001,9 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
 
               {/* Whole-Receipt Equal Split Member Selector */}
               {assignMode === 'whole_equal' && (
-                <div className="p-4 rounded-2xl bg-indigo-50/70 border border-indigo-200 space-y-3">
+                <div className="p-4 rounded-2xl bg-[#FDF5E8] border-2 border-[#EAD8C0] space-y-3">
                   <div className="flex items-center justify-between flex-wrap gap-2">
-                    <span className="text-xs font-extrabold text-indigo-950">
+                    <span className="text-xs font-extrabold text-[#3E2C1E]">
                       👥 勾選要一起平分整張收據（{formatMoney(grandTotal, currency)}）的對象：
                     </span>
                     <div className="flex items-center gap-1.5">
@@ -1019,14 +1012,14 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
                         onClick={() =>
                           setWholeEqualMemberIds(group.members.map((m) => m.id))
                         }
-                        className="px-2 py-0.5 rounded-lg bg-white border border-indigo-200 text-[11px] font-bold text-indigo-700"
+                        className="px-2.5 py-0.5 rounded-lg bg-[#FFFDF9] border border-[#D8C3AC] text-[11px] font-extrabold text-[#8F4D22]"
                       >
                         全選
                       </button>
                       <button
                         type="button"
                         onClick={() => setWholeEqualMemberIds([])}
-                        className="px-2 py-0.5 rounded-lg bg-white border border-slate-200 text-[11px] font-bold text-slate-600"
+                        className="px-2.5 py-0.5 rounded-lg bg-[#FFFDF9] border border-[#D8C3AC] text-[11px] font-bold text-[#6E5643]"
                       >
                         清空
                       </button>
@@ -1039,20 +1032,20 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
                     onClick={() =>
                       handleToggleExcludePayerWholeEqual(!excludePayerInWholeEqual)
                     }
-                    className={`w-full p-2.5 rounded-xl border text-left text-xs font-bold flex items-center justify-between transition ${
+                    className={`w-full p-2.5 rounded-xl border text-left text-xs font-extrabold flex items-center justify-between transition ${
                       excludePayerInWholeEqual
-                        ? 'bg-amber-50 border-amber-300 text-amber-900'
-                        : 'bg-white border-slate-200 text-slate-700'
+                        ? 'bg-[#FCE394]/70 border-[#D8B962] text-[#3E2C1E]'
+                        : 'bg-[#FFFDF9] border-[#E2D0BC] text-[#5C4432]'
                     }`}
                   >
                     <span className="flex items-center gap-1.5">
-                      <UserMinus className="w-4 h-4 text-amber-600" />
+                      <UserMinus className="w-4 h-4 text-[#B06D3E]" />
                       <span>先付錢的人不參與這筆平分（純幫大家代墊）</span>
                     </span>
                     {excludePayerInWholeEqual ? (
-                      <CheckSquare className="w-4 h-4 text-amber-600" />
+                      <CheckSquare className="w-4 h-4 text-[#B06D3E]" />
                     ) : (
-                      <Square className="w-4 h-4 text-slate-400" />
+                      <Square className="w-4 h-4 text-[#B39B86]" />
                     )}
                   </button>
 
@@ -1064,10 +1057,10 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
                           key={m.id}
                           type="button"
                           onClick={() => handleToggleWholeEqualMember(m.id)}
-                          className={`p-2.5 rounded-xl border text-left flex items-center justify-between transition ${
+                          className={`p-2.5 rounded-xl text-left flex items-center justify-between transition ${
                             checked
-                              ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
-                              : 'bg-white text-slate-600 border-slate-200'
+                              ? 'bg-[#B06D3E] text-[#FFFDF9] border-2 border-[#3E2C1E] shadow-[0_2px_0_#3E2C1E]'
+                              : 'bg-[#FFFDF9] text-[#6E5643] border border-[#E2D0BC]'
                           }`}
                         >
                           <span className="text-xs font-bold truncate">{m.name}</span>
@@ -1084,13 +1077,13 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
               )}
 
               {/* Live Per-Person Calculation Preview */}
-              <div className="p-4 rounded-2xl bg-slate-900 text-white space-y-2.5">
+              <div className="p-4 rounded-2xl bg-[#4A3525] border-2 border-[#3E2C1E] text-[#FFFDF9] space-y-2.5">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-indigo-200">
+                  <span className="font-bold text-[#F5DEC6]">
                     🧮 每人應分攤金額即時預覽
                     {serviceFeePercent > 0 ? `（含 +${serviceFeePercent}% 服務費）` : ''}
                   </span>
-                  <span className="font-extrabold text-sky-300 text-sm">
+                  <span className="font-extrabold text-[#FCE394] text-sm">
                     總計 {formatMoney(grandTotal, currency)}
                   </span>
                 </div>
@@ -1102,11 +1095,13 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
                       <div
                         key={m.id}
                         className={`px-3 py-2 rounded-xl flex items-center justify-between text-xs ${
-                          amt > 0 ? 'bg-white/10 text-white' : 'bg-white/5 text-slate-400'
+                          amt > 0
+                            ? 'bg-[#FFFDF9]/15 text-[#FFFDF9]'
+                            : 'bg-[#FFFDF9]/5 text-[#B59F8B]'
                         }`}
                       >
                         <span className="font-semibold truncate">{m.name}</span>
-                        <span className="font-extrabold text-emerald-300">
+                        <span className="font-extrabold text-[#B9E6C3]">
                           {formatMoney(amt, currency)}
                         </span>
                       </div>
@@ -1115,12 +1110,12 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
                 </div>
 
                 {assignMode === 'itemized' && selectedItems.length > 1 && (
-                  <label className="pt-2 border-t border-white/10 flex items-center gap-2 text-[11px] text-slate-300 cursor-pointer">
+                  <label className="pt-2 border-t border-[#FFFDF9]/15 flex items-center gap-2 text-[11px] text-[#EAD6C2] cursor-pointer">
                     <input
                       type="checkbox"
                       checked={saveAsSeparateExpenses}
                       onChange={(e) => setSaveAsSeparateExpenses(e.target.checked)}
-                      className="rounded text-indigo-500"
+                      className="rounded accent-[#FCE394]"
                     />
                     <span>
                       將每個品項拆成 {selectedItems.length}{' '}
@@ -1134,11 +1129,11 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="px-5 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-2.5 shrink-0">
+        <div className="px-5 py-3.5 bg-[#FAF1E2] border-t-2 border-[#E6D4BE] flex items-center justify-end gap-2.5 shrink-0">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2.5 rounded-2xl bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs sm:text-sm font-bold transition"
+            className="px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold btn-bobo"
           >
             取消
           </button>
@@ -1146,7 +1141,7 @@ export const ReceiptScannerModal: React.FC<ReceiptScannerModalProps> = ({
             <button
               type="button"
               onClick={handleConfirmImport}
-              className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:opacity-95 text-white text-xs sm:text-sm font-extrabold shadow-md flex items-center gap-1.5 transition"
+              className="px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-extrabold flex items-center gap-1.5 btn-quokka"
             >
               <Check className="w-4 h-4" />
               <span>確認寫入分帳本 ({formatMoney(grandTotal, currency)})</span>

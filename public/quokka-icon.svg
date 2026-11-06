@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="none">
+  <!-- Creamy Butter Background -->
+  <rect width="256" height="256" rx="58" fill="#FAF2E1"/>
+  <rect x="10" y="10" width="236" height="236" rx="48" stroke="#E8D7BE" stroke-width="4" stroke-dasharray="8 8"/>
+
+  <!-- Cute floating butter star & heart -->
+  <path d="M48 48 L52 58 L62 62 L52 66 L48 76 L44 66 L34 62 L44 58 Z" fill="#F4C95D"/>
+  <path d="M196 52 C196 46, 204 44, 207 49.5 C210 44, 218 46, 218 52 C218 59, 207 65, 207 65 C207 65, 196 59, 196 52 Z" fill="#EA8A79"/>
+
+  <!-- BOBO (Fluffy White Marshmallow Bear on right, full face visible!) -->
+  <g transform="translate(142, 92)">
+    <circle cx="20" cy="22" r="13" fill="#FFFDF9" stroke="#3E2C1E" stroke-width="6"/>
+    <circle cx="72" cy="22" r="13" fill="#FFFDF9" stroke="#3E2C1E" stroke-width="6"/>
+    <path d="M12 78 C10 42, 22 20, 46 20 C70 20, 82 42, 80 78 C79 98, 66 108, 46 108 C26 108, 13 98, 12 78 Z" fill="#FFFDF9" stroke="#3E2C1E" stroke-width="6" stroke-linejoin="round"/>
+    <circle cx="35" cy="55" r="4.3" fill="#3E2C1E"/>
+    <circle cx="57" cy="55" r="4.3" fill="#3E2C1E"/>
+    <ellipse cx="24" cy="64" rx="7.2" ry="4.5" fill="#F7B7A9" opacity="0.85"/>
+    <ellipse cx="68" cy="64" rx="7.2" ry="4.5" fill="#F7B7A9" opacity="0.85"/>
+    <ellipse cx="46" cy="61" rx="5" ry="3.8" fill="#3E2C1E"/>
+    <path d="M40 69 Q46 74.5 52 69" stroke="#3E2C1E" stroke-width="4.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- QUOKKA (Happy Caramel Marsupial on left/front) -->
+  <g transform="translate(18, 62)">
+    <!-- Round Ears -->
+    <circle cx="30" cy="28" r="17" fill="#BD7B4D" stroke="#3E2C1E" stroke-width="6.5"/>
+    <circle cx="30" cy="28" r="8" fill="#F2D5B8"/>
+    <circle cx="102" cy="28" r="17" fill="#BD7B4D" stroke="#3E2C1E" stroke-width="6.5"/>
+    <circle cx="102" cy="28" r="8" fill="#F2D5B8"/>
+
+    <!-- Chubby Pear-Shaped Quokka Head/Body -->
+    <path d="M14 102 C10 54, 30 24, 66 24 C102 24, 122 54, 118 102 C115 134, 96 148, 66 148 C36 148, 17 134, 14 102 Z" fill="#BD7B4D" stroke="#3E2C1E" stroke-width="6.5" stroke-linejoin="round"/>
+
+    <!-- Cream Belly Patch -->
+    <ellipse cx="66" cy="126" rx="29" ry="17" fill="#F5DEC6"/>
+
+    <!-- Happy Bean Eyes -->
+    <circle cx="49" cy="68" r="5" fill="#3E2C1E"/>
+    <circle cx="83" cy="68" r="5" fill="#3E2C1E"/>
+
+    <!-- Rosy Cheeks -->
+    <ellipse cx="34" cy="79" rx="9.5" ry="6" fill="#EB8B78" opacity="0.85"/>
+    <ellipse cx="98" cy="79" rx="9.5" ry="6" fill="#EB8B78" opacity="0.85"/>
+
+    <!-- Nose & Big Cheerful Quokka Smile -->
+    <ellipse cx="66" cy="75" rx="7" ry="5.2" fill="#3E2C1E"/>
+    <path d="M51 85 Q66 103 81 85 Z" fill="#E56F5E" stroke="#3E2C1E" stroke-width="5" stroke-linejoin="round"/>
+
+    <!-- Holding a Toasted Marshmallow Stick neatly between Quokka & BOBO -->
+    <line x1="94" y1="130" x2="117" y2="104" stroke="#3E2C1E" stroke-width="5.2" stroke-linecap="round"/>
+    <rect x="108" y="87" width="21" height="25" rx="8" transform="rotate(24 118 99)" fill="#FFFDF9" stroke="#3E2C1E" stroke-width="5.2"/>
+  </g>
+</svg>

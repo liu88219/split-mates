@@ -29,6 +29,7 @@ import {
   CATEGORY_META,
   fetchLiveRatesToBase,
   formatMoney,
+  getCreamyAvatarClass,
 } from './utils/currencies';
 import {
   calculateGroupBalances,
@@ -61,6 +62,12 @@ import { CloudSettingsModal } from './components/CloudSettingsModal';
 import { NewGroupModal } from './components/NewGroupModal';
 import { EditGroupModal } from './components/EditGroupModal';
 import { OwnerAdminModal } from './components/OwnerAdminModal';
+import {
+  BoboFaceBadge,
+  QuokkaBoboHeroDuo,
+  QuokkaEmptyReceiptArt,
+  QuokkaFaceBadge,
+} from './components/QuokkaBoboArt';
 
 function isUneditedDefaultGroup(g: BillGroup): boolean {
   if (g.updatedAt <= 1000) return true;
@@ -786,25 +793,25 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 pb-28">
-      {/* Top App Bar: Ultra-clean! Only current group avatar + name on left; Share + private Owner Admin button on right */}
-      <header className="sticky top-0 z-30 bg-slate-900/95 backdrop-blur-md text-white border-b border-slate-800">
+    <div className="min-h-screen pb-28 text-[#4A3525]">
+      {/* Top App Bar: Minimalist Creamy Stationery Bar — current group on left; Share + private Owner Admin button on right */}
+      <header className="sticky top-0 z-30 bg-[#FFFDF9]/95 backdrop-blur-md text-[#3E2C1E] border-b-2 border-[#EADCCB]">
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
-          {/* Left: Current Group Avatar & Title (No blue text, no arrows, no other group icons!) */}
+          {/* Left: Current Group Avatar + Quokka Accent & Title */}
           <div className="flex items-center gap-2.5 min-w-0">
             {activeGroup.coverImageUrl ? (
               <img
                 src={activeGroup.coverImageUrl}
                 alt={activeGroup.name}
-                className="w-9 h-9 rounded-2xl object-cover border border-white/20 shadow-md shrink-0"
+                className="w-9 h-9 rounded-2xl object-cover border-2 border-[#3E2C1E] shadow-[0_2px_0_#3E2C1E] shrink-0"
               />
             ) : (
-              <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-indigo-500 to-pink-500 flex items-center justify-center text-lg shadow-md shrink-0">
+              <div className="w-9 h-9 rounded-2xl bg-[#FCE394] border-2 border-[#3E2C1E] shadow-[0_2px_0_#3E2C1E] flex items-center justify-center text-lg shrink-0">
                 {activeGroup.coverEmoji}
               </div>
             )}
 
-            <span className="font-bold text-base sm:text-lg truncate">
+            <span className="font-extrabold text-base sm:text-lg text-[#3E2C1E] truncate">
               {activeGroup.name}
             </span>
           </div>
@@ -814,7 +821,7 @@ export const App: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsShareModalOpen(true)}
-              className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:opacity-95 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition"
+              className="px-3.5 py-1.5 rounded-xl bg-[#FCE394] hover:bg-[#F9D876] text-[#3E2C1E] border-2 border-[#3E2C1E] shadow-[0_2px_0_#3E2C1E] active:translate-y-[1px] active:shadow-none text-xs font-extrabold flex items-center gap-1.5 transition"
             >
               <Share2 className="w-3.5 h-3.5" />
               <span>LINE / IG 分享</span>
@@ -825,9 +832,9 @@ export const App: React.FC = () => {
                 type="button"
                 onClick={handleOpenOwnerAdmin}
                 title="管理員專屬：我的所有群組 / 封存 / 編輯與設定"
-                className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-bold flex items-center gap-1 border border-slate-700 transition"
+                className="px-2.5 py-1.5 rounded-xl bg-[#F5ECE0] hover:bg-[#EDE0CF] text-[#5C402B] text-xs font-extrabold flex items-center gap-1 border-2 border-[#D9C6B0] transition"
               >
-                <Crown className="w-3.5 h-3.5" />
+                <Crown className="w-3.5 h-3.5 text-[#B06D3E]" />
                 <span>我的帳本</span>
               </button>
             )}
@@ -838,12 +845,12 @@ export const App: React.FC = () => {
       {/* Toast Notification Banner */}
       {bannerNotice && (
         <div className="max-w-3xl mx-auto px-4 mt-3">
-          <div className="px-4 py-2.5 rounded-2xl bg-indigo-950 text-white text-xs font-semibold shadow-lg flex items-center justify-between">
+          <div className="px-4 py-2.5 rounded-2xl bg-[#4A3525] text-[#FFFDF9] border-2 border-[#3E2C1E] text-xs font-bold shadow-[0_3px_0_#2D1F15] flex items-center justify-between">
             <span>{bannerNotice}</span>
             <button
               type="button"
               onClick={() => setBannerNotice(null)}
-              className="text-indigo-300 hover:text-white ml-2"
+              className="text-[#FCE394] hover:text-white ml-2 font-extrabold"
             >
               ✕
             </button>
@@ -853,15 +860,15 @@ export const App: React.FC = () => {
 
       {/* Main Content Container (Strictly ONLY the current group!) */}
       <main className="max-w-3xl mx-auto px-4 pt-4 space-y-4">
-        {/* Hero Overview Card */}
-        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white p-5 sm:p-6 shadow-xl">
+        {/* Hero Overview Card: Quokka & BOBO Minimalist Creamy Stationery */}
+        <section className="relative overflow-hidden rounded-[28px] bg-gradient-to-br from-[#FFFDF9] via-[#FFF9EC] to-[#F7EBDA] text-[#3E2C1E] p-5 sm:p-6 border-2 border-[#3E2C1E] shadow-[0_5px_0_#DFCEB9]">
           <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="space-y-1.5">
+            <div className="space-y-2 min-w-0">
               <div className="flex flex-wrap items-center gap-1.5">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/10 text-indigo-200 text-xs font-medium">
-                  <span>基準結算幣別：{activeGroup.baseCurrency}</span>
+                <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#F4E8D8] border border-[#E2CEB7] text-[#6E5039] text-xs font-bold">
+                  <span>基準結算：{activeGroup.baseCurrency}</span>
                   <span>·</span>
-                  <span>{activeGroup.members.length} 位好友共同分帳</span>
+                  <span>{activeGroup.members.length} 位好友分帳</span>
                 </div>
                 <button
                   type="button"
@@ -890,62 +897,81 @@ export const App: React.FC = () => {
                     await runOwnerVaultSync();
                     showNotice('☁️ 已完成跨瀏覽器與分享連結永久雲端同步！');
                   }}
-                  className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/30 text-emerald-200 text-xs font-semibold transition"
+                  className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#EBF4EC] hover:bg-[#DCEBDD] border border-[#C3DEC7] text-[#426E4D] text-xs font-bold transition"
                 >
                   <RotateCcw className="w-3 h-3" />
                   <span>雲端即時同步</span>
                 </button>
               </div>
 
-              <div className="flex items-center gap-3 pt-0.5">
-                {activeGroup.coverImageUrl ? (
-                  <img
-                    src={activeGroup.coverImageUrl}
-                    alt={activeGroup.name}
-                    className="w-12 h-12 rounded-2xl object-cover border-2 border-white/25 shadow-md"
-                  />
-                ) : (
-                  <span className="text-3xl">{activeGroup.coverEmoji}</span>
-                )}
-                <div>
-                  <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">
-                    {activeGroup.name}
-                  </h1>
-                  {activeGroup.description && (
-                    <p className="text-xs text-slate-300 mt-0.5">
-                      {activeGroup.description}
-                    </p>
+              <div className="flex items-center justify-between gap-2 pt-0.5">
+                <div className="flex items-center gap-3 min-w-0">
+                  {activeGroup.coverImageUrl ? (
+                    <img
+                      src={activeGroup.coverImageUrl}
+                      alt={activeGroup.name}
+                      className="w-12 h-12 rounded-2xl object-cover border-2 border-[#3E2C1E] shadow-[0_2px_0_#3E2C1E] shrink-0"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-2xl bg-[#FFF3C4] border-2 border-[#3E2C1E] shadow-[0_2px_0_#3E2C1E] flex items-center justify-center text-2xl shrink-0">
+                      {activeGroup.coverEmoji}
+                    </div>
                   )}
+                  <div className="min-w-0">
+                    <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-[#3E2C1E] truncate">
+                      {activeGroup.name}
+                    </h1>
+                    {activeGroup.description ? (
+                      <p className="text-xs text-[#7D624E] mt-0.5 line-clamp-2">
+                        {activeGroup.description}
+                      </p>
+                    ) : (
+                      <p className="text-xs text-[#8C705A] mt-0.5">
+                        Quokka &amp; BOBO 陪大家輕鬆記帳不傷感情 🍪
+                      </p>
+                    )}
+                  </div>
                 </div>
+
+                {/* Mobile Quokka & BOBO Mascot Duo */}
+                <QuokkaBoboHeroDuo className="w-24 h-16 shrink-0 sm:hidden" />
               </div>
             </div>
 
-            <div className="sm:text-right bg-white/10 backdrop-blur-sm rounded-2xl p-3.5 border border-white/10">
-              <div className="text-xs text-indigo-200">群組累計總花費</div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-sky-300 mt-0.5">
-                {formatMoney(Math.round(totalSpendBase), activeGroup.baseCurrency)}
-              </div>
-              <div className="text-[11px] text-slate-300 mt-0.5">
-                平均每人約{' '}
-                {formatMoney(
-                  Math.round(
-                    totalSpendBase / Math.max(1, activeGroup.members.length)
-                  ),
-                  activeGroup.baseCurrency
-                )}{' '}
-                · 共 {activeGroup.expenses.length} 筆
+            <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0">
+              {/* Desktop Quokka & BOBO Mascot Duo */}
+              <QuokkaBoboHeroDuo className="w-28 h-20 shrink-0 hidden sm:block" />
+
+              <div className="flex-1 sm:flex-initial sm:text-right bg-[#FFFDF9] rounded-2xl p-3.5 border-2 border-[#E6D4BE] shadow-[0_3px_0_#EADBC8]">
+                <div className="text-xs font-bold text-[#8C705A]">群組累計總花費</div>
+                <div className="text-2xl sm:text-3xl font-extrabold text-[#B06D3E] mt-0.5">
+                  {formatMoney(Math.round(totalSpendBase), activeGroup.baseCurrency)}
+                </div>
+                <div className="text-xs text-[#7D624E] mt-0.5 font-medium">
+                  平均每人約{' '}
+                  {formatMoney(
+                    Math.round(
+                      totalSpendBase / Math.max(1, activeGroup.members.length)
+                    ),
+                    activeGroup.baseCurrency
+                  )}{' '}
+                  · 共 {activeGroup.expenses.length} 筆
+                </div>
               </div>
             </div>
           </div>
 
           {/* Quick Action Strip inside Hero */}
-          <div className="relative z-10 mt-5 pt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-2">
+          <div className="relative z-10 mt-4 pt-3.5 border-t-2 border-dashed border-[#E6D5C1] flex flex-wrap items-center justify-between gap-2.5">
             <div className="flex items-center -space-x-1.5 overflow-hidden">
-              {activeGroup.members.map((m) => (
+              {activeGroup.members.map((m, idx) => (
                 <div
                   key={m.id}
                   title={m.name}
-                  className={`w-7 h-7 rounded-full ${m.avatarColor} ring-2 ring-slate-900 text-white text-xs font-bold flex items-center justify-center`}
+                  className={`w-7 h-7 rounded-full ${getCreamyAvatarClass(
+                    m.avatarColor,
+                    idx
+                  )} ring-2 ring-[#FFFDF9] border border-[#3E2C1E]/30 text-[#FFFDF9] text-xs font-extrabold flex items-center justify-center`}
                 >
                   {m.name.slice(0, 1)}
                 </div>
@@ -953,7 +979,7 @@ export const App: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setActiveTab('members')}
-                className="ml-3 pl-2 text-xs text-indigo-200 hover:text-white font-medium underline"
+                className="ml-3 pl-2 text-xs text-[#7A5438] hover:text-[#3E2C1E] font-bold underline underline-offset-2"
               >
                 成員與收款帳號 ({activeGroup.members.length})
               </button>
@@ -963,17 +989,17 @@ export const App: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsShareModalOpen(true)}
-                className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition flex items-center gap-1.5"
+                className="px-3.5 py-2 rounded-xl btn-bobo text-xs font-extrabold flex items-center gap-1.5"
               >
-                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                <Sparkles className="w-3.5 h-3.5 text-[#C98A2C]" />
                 產生結算圖片小卡
               </button>
               <button
                 type="button"
                 onClick={() => setIsReceiptScannerOpen(true)}
-                className="px-3.5 py-2 rounded-xl bg-fuchsia-500/25 hover:bg-fuchsia-500/35 border border-fuchsia-300/30 text-white text-xs font-bold transition flex items-center gap-1.5"
+                className="px-3.5 py-2 rounded-xl btn-butter text-xs font-extrabold flex items-center gap-1.5"
               >
-                <Camera className="w-3.5 h-3.5 text-fuchsia-200" />
+                <Camera className="w-3.5 h-3.5 text-[#4A3525]" />
                 拍收據分帳
               </button>
               <button
@@ -982,7 +1008,7 @@ export const App: React.FC = () => {
                   setEditingExpense(null);
                   setIsExpenseModalOpen(true);
                 }}
-                className="px-4 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white text-xs font-bold shadow-lg shadow-indigo-500/30 transition flex items-center gap-1.5"
+                className="px-4 py-2 rounded-xl btn-quokka text-xs font-extrabold flex items-center gap-1.5"
               >
                 <Plus className="w-4 h-4" />
                 記一筆花費
@@ -992,14 +1018,14 @@ export const App: React.FC = () => {
         </section>
 
         {/* Primary 3-Tab Switcher */}
-        <nav className="grid grid-cols-3 gap-1.5 p-1.5 bg-white rounded-2xl shadow-sm border border-slate-200">
+        <nav className="grid grid-cols-3 gap-1.5 p-1.5 bg-[#F3EAE0] rounded-2xl border-2 border-[#E5D5C3]">
           <button
             type="button"
             onClick={() => setActiveTab('expenses')}
-            className={`py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 transition ${
+            className={`py-2.5 px-3 rounded-xl text-xs sm:text-sm font-extrabold flex items-center justify-center gap-1.5 transition ${
               activeTab === 'expenses'
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-slate-600 hover:bg-slate-50'
+                ? 'bg-[#FFFDF9] text-[#3E2C1E] border-2 border-[#3E2C1E] shadow-[0_2px_0_#3E2C1E]'
+                : 'text-[#7D624E] hover:text-[#3E2C1E] hover:bg-[#FAF5EC]'
             }`}
           >
             <Receipt className="w-4 h-4" />
@@ -1009,10 +1035,10 @@ export const App: React.FC = () => {
           <button
             type="button"
             onClick={() => setActiveTab('settlement')}
-            className={`py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 transition ${
+            className={`py-2.5 px-3 rounded-xl text-xs sm:text-sm font-extrabold flex items-center justify-center gap-1.5 transition ${
               activeTab === 'settlement'
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-slate-600 hover:bg-slate-50'
+                ? 'bg-[#FFFDF9] text-[#3E2C1E] border-2 border-[#3E2C1E] shadow-[0_2px_0_#3E2C1E]'
+                : 'text-[#7D624E] hover:text-[#3E2C1E] hover:bg-[#FAF5EC]'
             }`}
           >
             <ArrowRightLeft className="w-4 h-4" />
@@ -1022,10 +1048,10 @@ export const App: React.FC = () => {
           <button
             type="button"
             onClick={() => setActiveTab('members')}
-            className={`py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 transition ${
+            className={`py-2.5 px-3 rounded-xl text-xs sm:text-sm font-extrabold flex items-center justify-center gap-1.5 transition ${
               activeTab === 'members'
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-slate-600 hover:bg-slate-50'
+                ? 'bg-[#FFFDF9] text-[#3E2C1E] border-2 border-[#3E2C1E] shadow-[0_2px_0_#3E2C1E]'
+                : 'text-[#7D624E] hover:text-[#3E2C1E] hover:bg-[#FAF5EC]'
             }`}
           >
             <Users className="w-4 h-4" />
@@ -1041,27 +1067,30 @@ export const App: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setFilterMemberId('all')}
-                className={`px-3 py-1.5 rounded-full text-xs font-bold shrink-0 transition ${
+                className={`px-3.5 py-1.5 rounded-full text-xs font-extrabold shrink-0 transition ${
                   filterMemberId === 'all'
-                    ? 'bg-slate-900 text-white'
-                    : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+                    ? 'bg-[#4A3525] text-[#FFFDF9] border-2 border-[#3E2C1E]'
+                    : 'bg-[#FFFDF9] text-[#6E5340] border border-[#E4D4C1] hover:bg-[#F7EFE4]'
                 }`}
               >
                 全部帳目 ({activeGroup.expenses.length})
               </button>
-              {activeGroup.members.map((m) => (
+              {activeGroup.members.map((m, idx) => (
                 <button
                   key={m.id}
                   type="button"
                   onClick={() => setFilterMemberId(m.id)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-bold shrink-0 flex items-center gap-1.5 transition ${
+                  className={`px-3 py-1.5 rounded-full text-xs font-extrabold shrink-0 flex items-center gap-1.5 transition ${
                     filterMemberId === m.id
-                      ? 'bg-indigo-600 text-white'
-                      : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+                      ? 'bg-[#FCE394] text-[#3E2C1E] border-2 border-[#3E2C1E]'
+                      : 'bg-[#FFFDF9] text-[#6E5340] border border-[#E4D4C1] hover:bg-[#F7EFE4]'
                   }`}
                 >
                   <span
-                    className={`w-4 h-4 rounded-full ${m.avatarColor} text-white text-[10px] flex items-center justify-center`}
+                    className={`w-4 h-4 rounded-full ${getCreamyAvatarClass(
+                      m.avatarColor,
+                      idx
+                    )} text-[#FFFDF9] text-[10px] font-bold flex items-center justify-center`}
                   >
                     {m.name.slice(0, 1)}
                   </span>
@@ -1071,17 +1100,19 @@ export const App: React.FC = () => {
             </div>
 
             {filteredExpenses.length === 0 ? (
-              <div className="bg-white rounded-3xl p-10 text-center border border-slate-200 space-y-3">
-                <div className="text-4xl">🧾</div>
-                <h3 className="text-base font-bold text-slate-800">目前還沒有分帳紀錄</h3>
-                <p className="text-xs text-slate-500">
-                  點選下方按鈕新增第一筆消費，可自由勾選誰要參與平分（先付錢的人也可以不參與分攤）！
+              <div className="cream-card p-8 sm:p-10 text-center space-y-3">
+                <QuokkaEmptyReceiptArt className="w-40 h-28 mx-auto" />
+                <h3 className="text-base font-extrabold text-[#3E2C1E]">
+                  目前還沒有分帳紀錄唷！
+                </h3>
+                <p className="text-xs text-[#7D624E] max-w-md mx-auto leading-relaxed">
+                  點選下方按鈕記下第一筆花費，或直接拍下收據讓 Quokka &amp; BOBO 幫妳自動拆品項分帳（先付錢的人也可以不參與分攤）！
                 </p>
-                <div className="flex flex-wrap items-center justify-center gap-2">
+                <div className="flex flex-wrap items-center justify-center gap-2.5 pt-1">
                   <button
                     type="button"
                     onClick={() => setIsReceiptScannerOpen(true)}
-                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-violet-100 hover:bg-violet-200 text-violet-800 text-xs font-bold transition"
+                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-2xl btn-butter text-xs font-extrabold"
                   >
                     <Camera className="w-4 h-4" />
                     拍收據自動偵測品項
@@ -1092,7 +1123,7 @@ export const App: React.FC = () => {
                       setEditingExpense(null);
                       setIsExpenseModalOpen(true);
                     }}
-                    className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-2xl bg-indigo-600 text-white text-xs font-bold shadow-md"
+                    className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-2xl btn-quokka text-xs font-extrabold"
                   >
                     <Plus className="w-4 h-4" />
                     新增第一筆帳目
@@ -1100,7 +1131,7 @@ export const App: React.FC = () => {
                 </div>
               </div>
             ) : (
-              <div className="space-y-2.5">
+              <div className="space-y-3">
                 {filteredExpenses.map((exp) => {
                   const cat = CATEGORY_META[exp.category] || CATEGORY_META.other;
                   const payerNames = exp.paidBy
@@ -1129,7 +1160,7 @@ export const App: React.FC = () => {
                   return (
                     <div
                       key={exp.id}
-                      className="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-sm hover:border-indigo-200 transition space-y-3"
+                      className="bg-[#FFFDF9] rounded-3xl p-4 border-2 border-[#EADCCB] hover:border-[#D3B597] shadow-[0_3px_0_#EFE4D6] transition space-y-3"
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex items-start gap-3 min-w-0">
@@ -1140,22 +1171,22 @@ export const App: React.FC = () => {
                           </div>
                           <div className="min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
-                              <h3 className="text-sm sm:text-base font-bold text-slate-900 truncate">
+                              <h3 className="text-sm sm:text-base font-extrabold text-[#3E2C1E] truncate">
                                 {exp.title}
                               </h3>
-                              <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 text-[11px] font-semibold">
+                              <span className="px-2 py-0.5 rounded-full bg-[#F5ECE0] border border-[#E5D4BF] text-[#6E523D] text-xs font-bold">
                                 {modeLabel}
                               </span>
                             </div>
-                            <div className="text-xs text-slate-500 mt-0.5 flex items-center gap-1.5 flex-wrap">
+                            <div className="text-xs text-[#856A56] mt-0.5 flex items-center gap-1.5 flex-wrap">
                               <span>📅 {exp.date}</span>
                               <span>·</span>
-                              <span className="text-indigo-700 font-semibold">
+                              <span className="text-[#9E5B30] font-bold">
                                 💳 {payerNames} 先墊付
                               </span>
                             </div>
                             {exp.note && (
-                              <p className="text-xs text-slate-500 mt-1 bg-slate-50 px-2.5 py-1 rounded-lg">
+                              <p className="text-xs text-[#6E5441] mt-1.5 bg-[#FAF4EA] border border-[#EDE0CE] px-2.5 py-1 rounded-xl">
                                 💬 {exp.note}
                               </p>
                             )}
@@ -1163,14 +1194,14 @@ export const App: React.FC = () => {
                         </div>
 
                         <div className="text-right shrink-0">
-                          <div className="text-base sm:text-lg font-extrabold text-slate-900">
+                          <div className="text-base sm:text-lg font-extrabold text-[#3E2C1E]">
                             {formatMoney(
                               Math.round(exp.baseAmount),
                               activeGroup.baseCurrency
                             )}
                           </div>
                           {exp.currency !== activeGroup.baseCurrency && (
-                            <div className="text-xs font-semibold text-indigo-600">
+                            <div className="text-xs font-bold text-[#B06D3E]">
                               原幣 {formatMoney(exp.originalAmount, exp.currency)} (匯率{' '}
                               {exp.exchangeRateToBase})
                             </div>
@@ -1182,7 +1213,7 @@ export const App: React.FC = () => {
                                 setEditingExpense(exp);
                                 setIsExpenseModalOpen(true);
                               }}
-                              className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition"
+                              className="p-1.5 rounded-xl text-[#9C826D] hover:text-[#3E2C1E] hover:bg-[#F5ECE0] transition"
                               title="編輯此筆帳目"
                             >
                               <Edit3 className="w-3.5 h-3.5" />
@@ -1190,7 +1221,7 @@ export const App: React.FC = () => {
                             <button
                               type="button"
                               onClick={() => handleDeleteExpense(exp.id)}
-                              className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition"
+                              className="p-1.5 rounded-xl text-[#9C826D] hover:text-[#C85A48] hover:bg-[#FCECE9] transition"
                               title="刪除此筆帳目"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
@@ -1200,7 +1231,7 @@ export const App: React.FC = () => {
                       </div>
 
                       {/* Per-member split chips */}
-                      <div className="pt-2.5 border-t border-slate-100 flex flex-wrap gap-1.5">
+                      <div className="pt-2.5 border-t border-dashed border-[#EADCCB] flex flex-wrap gap-1.5">
                         {activeSplits.map((s) => {
                           const mem = activeGroup.members.find(
                             (m) => m.id === s.memberId
@@ -1211,18 +1242,20 @@ export const App: React.FC = () => {
                           return (
                             <span
                               key={s.memberId}
-                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200/80 text-[11px] text-slate-700"
+                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#FAF5ED] border border-[#E8D9C6] text-xs text-[#5C4433]"
                             >
-                              <span className="font-semibold">{mem.name}</span>
-                              <span className="text-slate-400">應攤</span>
-                              <span className="font-bold text-slate-900">
+                              <span className="font-bold">{mem.name}</span>
+                              <span className="text-[#9E8570]">應攤</span>
+                              <span className="font-extrabold text-[#3E2C1E]">
                                 {formatMoney(
                                   Math.round(baseShare),
                                   activeGroup.baseCurrency
                                 )}
                               </span>
                               {exp.splitMode === 'shares' && (
-                                <span className="text-indigo-600">({s.value}份)</span>
+                                <span className="text-[#B06D3E] font-bold">
+                                  ({s.value}份)
+                                </span>
                               )}
                             </span>
                           );
@@ -1240,16 +1273,16 @@ export const App: React.FC = () => {
         {activeTab === 'settlement' && (
           <section className="space-y-4">
             {/* Minimum Transfers Card */}
-            <div className="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-4">
+            <div className="cream-card p-5 space-y-4">
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <div>
-                  <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                  <h2 className="text-base font-extrabold text-[#3E2C1E] flex items-center gap-2">
                     <span>⚡ 最少轉帳次數結算建議</span>
-                    <span className="px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700 text-xs">
+                    <span className="px-2.5 py-0.5 rounded-full bg-[#FFF2C6] border border-[#EBD38B] text-[#7A521D] text-xs font-extrabold">
                       只需轉帳 {transfers.length} 筆
                     </span>
                   </h2>
-                  <p className="text-xs text-slate-500 mt-0.5">
+                  <p className="text-xs text-[#7D624E] mt-0.5">
                     系統已自動抵銷多方交叉墊付，算出最省事的還款路徑：
                   </p>
                 </div>
@@ -1257,7 +1290,7 @@ export const App: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsShareModalOpen(true)}
-                  className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition"
+                  className="px-3.5 py-2 rounded-xl btn-quokka text-xs font-extrabold flex items-center gap-1.5"
                 >
                   <Share2 className="w-3.5 h-3.5" />
                   一鍵轉發結算單到 LINE / IG
@@ -1265,10 +1298,13 @@ export const App: React.FC = () => {
               </div>
 
               {transfers.length === 0 ? (
-                <div className="p-6 rounded-2xl bg-emerald-50 border border-emerald-200 text-center space-y-1">
-                  <div className="text-2xl">🎉</div>
-                  <div className="text-sm font-bold text-emerald-900">
-                    太棒了！目前所有帳目皆已結清，大家互不相欠！
+                <div className="p-6 rounded-2xl bg-[#EBF4EC] border-2 border-[#C5DEC8] text-center space-y-2">
+                  <div className="flex items-center justify-center gap-1">
+                    <QuokkaFaceBadge className="w-11 h-11" />
+                    <BoboFaceBadge className="w-11 h-11" />
+                  </div>
+                  <div className="text-sm font-extrabold text-[#3A6344]">
+                    🎉 太棒了！目前所有帳目皆已結清，大家互不相欠！
                   </div>
                 </div>
               ) : (
@@ -1282,29 +1318,29 @@ export const App: React.FC = () => {
                     return (
                       <div
                         key={copyKey}
-                        className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                        className="p-4 rounded-2xl bg-[#FAF5EC] border-2 border-[#EADBC8] flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                       >
                         <div className="space-y-1">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-xs font-bold flex items-center justify-center">
+                            <span className="w-5 h-5 rounded-full bg-[#E8D7C3] text-[#4A3525] text-xs font-extrabold flex items-center justify-center">
                               {idx + 1}
                             </span>
-                            <span className="text-sm font-bold text-slate-900">
+                            <span className="text-sm font-extrabold text-[#3E2C1E]">
                               {t.fromMemberName}
                             </span>
-                            <span className="text-xs font-bold text-indigo-600 px-2 py-0.5 rounded-md bg-indigo-50">
+                            <span className="text-xs font-extrabold text-[#7A521D] px-2 py-0.5 rounded-lg bg-[#FCE394] border border-[#E5C86B]">
                               ➜ 應轉給 ➜
                             </span>
-                            <span className="text-sm font-bold text-slate-900">
+                            <span className="text-sm font-extrabold text-[#3E2C1E]">
                               {t.toMemberName}
                             </span>
-                            <span className="text-base font-extrabold text-rose-600 ml-1">
+                            <span className="text-base font-extrabold text-[#C85A48] ml-1">
                               {formatMoney(t.amount, activeGroup.baseCurrency)}
                             </span>
                           </div>
 
                           {receiver?.paymentInfo && (
-                            <div className="flex items-center gap-2 text-xs text-slate-600 pl-7">
+                            <div className="flex items-center gap-2 text-xs text-[#6E5340] pl-7 flex-wrap">
                               <span>🏦 {receiver.name} 收款方式：{receiver.paymentInfo}</span>
                               <button
                                 type="button"
@@ -1313,7 +1349,7 @@ export const App: React.FC = () => {
                                   setCopiedAccountIdx(copyKey);
                                   setTimeout(() => setCopiedAccountIdx(null), 2000);
                                 }}
-                                className="text-indigo-600 hover:underline font-semibold inline-flex items-center gap-0.5"
+                                className="text-[#B06D3E] hover:underline font-extrabold inline-flex items-center gap-0.5"
                               >
                                 {copiedAccountIdx === copyKey ? (
                                   <>
@@ -1334,7 +1370,7 @@ export const App: React.FC = () => {
                           onClick={() =>
                             handleMarkSettled(t.fromMemberId, t.toMemberId, t.amount)
                           }
-                          className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 shrink-0 shadow-sm transition"
+                          className="px-3.5 py-2 rounded-xl bg-[#5E8C6A] hover:bg-[#4E7A59] text-[#FFFDF9] border-2 border-[#3E2C1E] shadow-[0_2px_0_#3E2C1E] active:translate-y-[1px] active:shadow-none text-xs font-extrabold flex items-center justify-center gap-1.5 shrink-0 transition"
                         >
                           <CheckCircle2 className="w-4 h-4" />
                           標記已結清
@@ -1347,12 +1383,12 @@ export const App: React.FC = () => {
             </div>
 
             {/* Individual Net Balances */}
-            <div className="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-3">
-              <h3 className="text-sm font-extrabold text-slate-900">
+            <div className="cream-card p-5 space-y-3">
+              <h3 className="text-sm font-extrabold text-[#3E2C1E]">
                 📊 每位成員消費與先墊統計（基準幣：{activeGroup.baseCurrency}）
               </h3>
-              <div className="divide-y divide-slate-100">
-                {balances.map((b) => {
+              <div className="divide-y divide-dashed divide-[#EADCCB]">
+                {balances.map((b, idx) => {
                   const mem = activeGroup.members.find((m) => m.id === b.memberId);
                   return (
                     <div
@@ -1361,17 +1397,18 @@ export const App: React.FC = () => {
                     >
                       <div className="flex items-center gap-2.5">
                         <div
-                          className={`w-8 h-8 rounded-full ${
-                            mem?.avatarColor || 'bg-indigo-500'
-                          } text-white text-xs font-bold flex items-center justify-center`}
+                          className={`w-8 h-8 rounded-full ${getCreamyAvatarClass(
+                            mem?.avatarColor,
+                            idx
+                          )} text-[#FFFDF9] text-xs font-extrabold flex items-center justify-center border border-[#3E2C1E]/25`}
                         >
                           {b.memberName.slice(0, 1)}
                         </div>
                         <div>
-                          <div className="text-sm font-bold text-slate-900">
+                          <div className="text-sm font-extrabold text-[#3E2C1E]">
                             {b.memberName}
                           </div>
-                          <div className="text-xs text-slate-500">
+                          <div className="text-xs text-[#7D624E]">
                             個人應分攤{' '}
                             {formatMoney(
                               Math.round(b.totalOwed),
@@ -1388,15 +1425,15 @@ export const App: React.FC = () => {
 
                       <div className="text-right">
                         {b.netBalance > 0 ? (
-                          <span className="inline-block px-3 py-1 rounded-xl bg-emerald-50 text-emerald-700 font-extrabold text-xs border border-emerald-200">
+                          <span className="inline-block px-3 py-1 rounded-xl bg-[#EBF4EC] text-[#426E4D] font-extrabold text-xs border border-[#C3DEC7]">
                             應收回 +{formatMoney(Math.round(b.netBalance), activeGroup.baseCurrency)}
                           </span>
                         ) : b.netBalance < 0 ? (
-                          <span className="inline-block px-3 py-1 rounded-xl bg-rose-50 text-rose-700 font-extrabold text-xs border border-rose-200">
+                          <span className="inline-block px-3 py-1 rounded-xl bg-[#FCECE9] text-[#B84E3E] font-extrabold text-xs border border-[#F0C4BC]">
                             應付出 -{formatMoney(Math.round(Math.abs(b.netBalance)), activeGroup.baseCurrency)}
                           </span>
                         ) : (
-                          <span className="inline-block px-3 py-1 rounded-xl bg-slate-100 text-slate-600 font-bold text-xs">
+                          <span className="inline-block px-3 py-1 rounded-xl bg-[#F3EAE0] text-[#7D624E] font-bold text-xs">
                             已結清 $0
                           </span>
                         )}
@@ -1409,8 +1446,8 @@ export const App: React.FC = () => {
 
             {/* Settled History */}
             {activeGroup.settledRecords && activeGroup.settledRecords.length > 0 && (
-              <div className="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-3">
-                <h3 className="text-sm font-extrabold text-slate-900">
+              <div className="cream-card p-5 space-y-3">
+                <h3 className="text-sm font-extrabold text-[#3E2C1E]">
                   ✅ 已結清還款紀錄 ({activeGroup.settledRecords.length})
                 </h3>
                 <div className="space-y-2">
@@ -1424,20 +1461,20 @@ export const App: React.FC = () => {
                     return (
                       <div
                         key={rec.id}
-                        className="p-3 rounded-xl bg-emerald-50/60 border border-emerald-200 flex items-center justify-between text-xs"
+                        className="p-3 rounded-xl bg-[#EBF4EC]/80 border border-[#C5DEC8] flex items-center justify-between text-xs"
                       >
                         <div>
-                          <span className="font-bold text-slate-800">
+                          <span className="font-extrabold text-[#3E2C1E]">
                             {fromName} 已還給 {toName}
                           </span>
-                          <span className="ml-2 font-extrabold text-emerald-700">
+                          <span className="ml-2 font-extrabold text-[#426E4D]">
                             {formatMoney(rec.amount, activeGroup.baseCurrency)}
                           </span>
                         </div>
                         <button
                           type="button"
                           onClick={() => handleUndoSettlement(rec.id)}
-                          className="text-slate-500 hover:text-rose-600 font-semibold flex items-center gap-1"
+                          className="text-[#7D624E] hover:text-[#C85A48] font-bold flex items-center gap-1"
                         >
                           <RotateCcw className="w-3.5 h-3.5" />
                           復原
@@ -1457,18 +1494,18 @@ export const App: React.FC = () => {
             {/* Add New Member Card */}
             <form
               onSubmit={handleAddMember}
-              className="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-3"
+              className="cream-card p-5 space-y-3"
             >
               <div className="flex items-center justify-between">
-                <h2 className="text-sm font-extrabold text-slate-900 flex items-center gap-1.5">
-                  <UserPlus className="w-4 h-4 text-indigo-600" />
+                <h2 className="text-sm font-extrabold text-[#3E2C1E] flex items-center gap-1.5">
+                  <UserPlus className="w-4 h-4 text-[#B06D3E]" />
                   新增分帳好友
                 </h2>
                 {lineProfile && (
                   <button
                     type="button"
                     onClick={() => setNewMemberName(lineProfile.displayName)}
-                    className="text-xs font-bold text-[#06C755] hover:underline"
+                    className="text-xs font-extrabold text-[#4B7A57] hover:underline"
                   >
                     帶入我的 LINE 暱稱 ({lineProfile.displayName})
                   </button>
@@ -1480,18 +1517,18 @@ export const App: React.FC = () => {
                   value={newMemberName}
                   onChange={(e) => setNewMemberName(e.target.value)}
                   placeholder="好友暱稱（例如：小美）"
-                  className="px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="px-3.5 py-2.5 text-sm font-semibold cream-input"
                 />
                 <input
                   type="text"
                   value={newMemberPayment}
                   onChange={(e) => setNewMemberPayment(e.target.value)}
                   placeholder="收款資訊（選填：LINE Pay / 銀行帳號）"
-                  className="px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="px-3.5 py-2.5 text-sm cream-input"
                 />
                 <button
                   type="submit"
-                  className="py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold transition flex items-center justify-center gap-1.5"
+                  className="py-2.5 px-4 rounded-2xl btn-quokka text-sm font-extrabold flex items-center justify-center gap-1.5"
                 >
                   <Plus className="w-4 h-4" />
                   加入群組
@@ -1500,26 +1537,29 @@ export const App: React.FC = () => {
             </form>
 
             {/* Member List & Name / Payment Info Editor */}
-            <div className="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-3">
+            <div className="cream-card p-5 space-y-3">
               <div className="flex items-center gap-1.5">
-                <Wallet className="w-4 h-4 text-indigo-600" />
-                <h3 className="text-sm font-extrabold text-slate-900">
+                <Wallet className="w-4 h-4 text-[#B06D3E]" />
+                <h3 className="text-sm font-extrabold text-[#3E2C1E]">
                   群組成員名單與收款帳號編輯
                 </h3>
               </div>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-[#7D624E] leading-relaxed">
                 可直接點擊下方輸入框<strong>修改好友名字</strong>（例如將「好友 A」改為真實姓名，所有已記帳目會自動同步更新名稱），或填寫 <strong>LINE Pay / 街口 / 銀行帳號</strong>：
               </p>
 
               <div className="space-y-3 pt-1">
-                {activeGroup.members.map((m) => (
+                {activeGroup.members.map((m, idx) => (
                   <div
                     key={m.id}
-                    className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5"
+                    className="p-3.5 rounded-2xl bg-[#FAF5EC] border-2 border-[#EADBC8] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5"
                   >
                     <div className="flex items-center gap-2.5 sm:w-48 shrink-0">
                       <div
-                        className={`w-8 h-8 rounded-full ${m.avatarColor} text-white text-xs font-bold flex items-center justify-center shrink-0`}
+                        className={`w-8 h-8 rounded-full ${getCreamyAvatarClass(
+                          m.avatarColor,
+                          idx
+                        )} text-[#FFFDF9] text-xs font-extrabold flex items-center justify-center shrink-0 border border-[#3E2C1E]/25`}
                       >
                         {(m.name || '?').slice(0, 1)}
                       </div>
@@ -1531,9 +1571,9 @@ export const App: React.FC = () => {
                             handleUpdateMemberName(m.id, e.target.value)
                           }
                           placeholder="輸入好友名字"
-                          className="w-full pl-2.5 pr-6 py-1.5 rounded-xl border border-slate-300 bg-white text-sm font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500 outline-none"
+                          className="w-full pl-2.5 pr-6 py-1.5 text-sm font-extrabold cream-input"
                         />
-                        <Edit3 className="w-3.5 h-3.5 text-slate-400 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <Edit3 className="w-3.5 h-3.5 text-[#A88E78] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                       </div>
                     </div>
 
@@ -1545,14 +1585,14 @@ export const App: React.FC = () => {
                           handleUpdateMemberPayment(m.id, e.target.value)
                         }
                         placeholder="填寫收款資訊（例：LINE Pay / 台新 812-...）"
-                        className="w-full px-3 py-1.5 rounded-xl border border-slate-300 bg-white text-xs text-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none"
+                        className="w-full px-3 py-1.5 text-xs font-medium cream-input"
                       />
                       {activeGroup.members.length > 1 && (
                         <button
                           type="button"
                           onClick={() => handleRemoveMember(m.id)}
                           title="刪除此成員"
-                          className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition shrink-0"
+                          className="p-2 rounded-xl text-[#9C826D] hover:text-[#C85A48] hover:bg-[#FCECE9] transition shrink-0"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -1566,25 +1606,25 @@ export const App: React.FC = () => {
         )}
       </main>
 
-      {/* Floating Bottom Action Bar for Mobile (LINE & IG In-App Browser Friendly) */}
-      <div className="fixed bottom-0 inset-x-0 z-30 bg-white/90 backdrop-blur-md border-t border-slate-200 px-3 sm:px-4 py-3">
+      {/* Floating Bottom Action Bar for Mobile (Creamy Biscuit Bar) */}
+      <div className="fixed bottom-0 inset-x-0 z-30 bg-[#FFFDF9]/95 backdrop-blur-md border-t-2 border-[#EADCCB] px-3 sm:px-4 py-3">
         <div className="max-w-3xl mx-auto flex items-center gap-2">
           <button
             type="button"
             onClick={() => setIsShareModalOpen(true)}
-            className="flex-1 py-3 px-2.5 sm:px-4 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-md transition"
+            className="flex-1 py-3 px-2.5 sm:px-4 rounded-2xl bg-[#4A3525] hover:bg-[#3B2A1D] text-[#FFFDF9] border-2 border-[#3E2C1E] shadow-[0_3px_0_#2B1E14] active:translate-y-[1px] active:shadow-none font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition"
           >
-            <Share2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            <Share2 className="w-4 h-4 text-[#FCE394] shrink-0" />
             <span className="truncate">傳送結算單</span>
           </button>
 
           <button
             type="button"
             onClick={() => setIsReceiptScannerOpen(true)}
-            className="py-3 px-3.5 sm:px-4 rounded-2xl bg-violet-100 hover:bg-violet-200 text-violet-900 border border-violet-200 font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-sm transition shrink-0"
+            className="py-3 px-3.5 sm:px-4 rounded-2xl btn-butter font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 shrink-0"
             title="拍收據或菜單自動偵測品項與價錢分帳"
           >
-            <Camera className="w-4 h-4 text-violet-700 shrink-0" />
+            <Camera className="w-4 h-4 text-[#3E2C1E] shrink-0" />
             <span>拍收據</span>
           </button>
 
@@ -1594,7 +1634,7 @@ export const App: React.FC = () => {
               setEditingExpense(null);
               setIsExpenseModalOpen(true);
             }}
-            className="flex-[1.15] py-3 px-3 sm:px-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:opacity-95 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-lg shadow-indigo-500/25 transition"
+            className="flex-[1.15] py-3 px-3 sm:px-4 rounded-2xl btn-quokka font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5"
           >
             <Plus className="w-4 h-4 shrink-0" />
             <span className="truncate">記一筆花費</span>
@@ -1724,27 +1764,27 @@ export const App: React.FC = () => {
         }}
       />
 
-      {/* Confirm Delete Popup Modal (Confirm / Cancel) */}
+      {/* Confirm Delete Popup Modal (Creamy Confirm / Cancel) */}
       {pendingDelete && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/65 backdrop-blur-sm p-4">
-          <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl border border-slate-200 p-6 space-y-4 text-center animate-in fade-in zoom-in-95 duration-150">
-            <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#3E2C1E]/45 backdrop-blur-sm p-4">
+          <div className="bg-[#FFFDF9] w-full max-w-sm rounded-3xl border-2 border-[#3E2C1E] shadow-[0_6px_0_#3E2C1E] p-6 space-y-4 text-center">
+            <div className="w-12 h-12 rounded-2xl bg-[#FCECE9] border border-[#F0C4BC] text-[#C85A48] flex items-center justify-center mx-auto">
               <Trash2 className="w-6 h-6" />
             </div>
 
             <div className="space-y-1.5">
-              <h3 className="text-base font-extrabold text-slate-900">
+              <h3 className="text-base font-extrabold text-[#3E2C1E]">
                 {pendingDelete.type === 'member'
                   ? '確認刪除此成員？'
                   : pendingDelete.type === 'expense'
                   ? '確認刪除此筆消費？'
                   : '確認永久刪除此分帳群組？'}
               </h3>
-              <div className="text-sm font-bold text-rose-600">
+              <div className="text-sm font-extrabold text-[#C85A48]">
                 「{pendingDelete.name}」
               </div>
               {pendingDelete.detail && (
-                <p className="text-xs text-slate-500 leading-relaxed">
+                <p className="text-xs text-[#7D624E] leading-relaxed">
                   {pendingDelete.detail}
                 </p>
               )}
@@ -1754,14 +1794,14 @@ export const App: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setPendingDelete(null)}
-                className="py-2.5 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm transition"
+                className="py-2.5 px-4 rounded-2xl btn-bobo font-extrabold text-sm"
               >
                 取消
               </button>
               <button
                 type="button"
                 onClick={executeConfirmedDelete}
-                className="py-2.5 px-4 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm shadow-md shadow-rose-500/20 transition"
+                className="py-2.5 px-4 rounded-2xl bg-[#D96B59] hover:bg-[#C25847] text-[#FFFDF9] border-2 border-[#3E2C1E] shadow-[0_3px_0_#3E2C1E] active:translate-y-[1px] active:shadow-none font-extrabold text-sm transition"
               >
                 確認刪除
               </button>

@@ -2,7 +2,7 @@ import { BillGroup, MemberBalance, SimplifiedTransfer } from '../types/bill';
 import { formatMoney } from './currencies';
 
 /**
- * 使用 HTML5 Canvas 繪製高解析度 (Retina 2x) 的「IG / LINE 結算圖片小卡」
+ * 使用 HTML5 Canvas 繪製高解析度 (Retina 2x) 的「Quokka & BOBO 簡約奶油風 IG / LINE 結算圖片小卡」
  * 回傳 DataURL (image/png) 供預覽、下載或透過 Web Share API 直接傳送到 IG / LINE
  */
 export function renderSettlementCardToDataUrl(
@@ -15,37 +15,17 @@ export function renderSettlementCardToDataUrl(
   const memberRowHeight = 62;
   const paymentMembers = group.members.filter((m) => m.paymentInfo && m.paymentInfo.trim());
   const paymentSectionHeight =
-    paymentMembers.length > 0 ? 80 + paymentMembers.length * 46 : 0;
+    paymentMembers.length > 0 ? 84 + paymentMembers.length * 46 : 0;
 
-  const transfersHeight = Math.max(1, transfers.length) * transferRowHeight + 80;
-  const membersHeight = balances.length * memberRowHeight + 80;
-  const height = 340 + transfersHeight + membersHeight + paymentSectionHeight + 110;
+  const transfersHeight = Math.max(1, transfers.length) * transferRowHeight + 84;
+  const membersHeight = balances.length * memberRowHeight + 84;
+  const height = 356 + transfersHeight + membersHeight + paymentSectionHeight + 112;
 
   const canvas = document.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
   const ctx = canvas.getContext('2d');
   if (!ctx) return '';
-
-  // 1. Background
-  const bgGrad = ctx.createLinearGradient(0, 0, width, height);
-  bgGrad.addColorStop(0, '#0f172a');
-  bgGrad.addColorStop(0.4, '#1e1b4b');
-  bgGrad.addColorStop(1, '#0f172a');
-  ctx.fillStyle = bgGrad;
-  ctx.fillRect(0, 0, width, height);
-
-  // Decorative glow circles
-  ctx.save();
-  ctx.fillStyle = 'rgba(99, 102, 241, 0.18)';
-  ctx.beginPath();
-  ctx.arc(width - 100, 110, 200, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = 'rgba(236, 72, 153, 0.14)';
-  ctx.beginPath();
-  ctx.arc(100, height - 140, 220, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.restore();
 
   // Helper for rounded rectangle
   const drawRoundRect = (
@@ -55,7 +35,8 @@ export function renderSettlementCardToDataUrl(
     h: number,
     r: number,
     fill: string,
-    stroke?: string
+    stroke?: string,
+    lineW = 2.5
   ) => {
     ctx.beginPath();
     ctx.moveTo(x + r, y);
@@ -68,46 +49,151 @@ export function renderSettlementCardToDataUrl(
     ctx.fill();
     if (stroke) {
       ctx.strokeStyle = stroke;
-      ctx.lineWidth = 2;
+      ctx.lineWidth = lineW;
       ctx.stroke();
     }
   };
 
-  // 2. Header Banner
+  // 1. Warm Creamy Oatmeal Canvas Background
+  ctx.fillStyle = '#FAF5EB';
+  ctx.fillRect(0, 0, width, height);
+
+  // Subtle polka-dot stationery pattern
+  ctx.fillStyle = 'rgba(189, 123, 77, 0.08)';
+  for (let py = 28; py < height; py += 36) {
+    for (let px = 28; px < width; px += 36) {
+      ctx.beginPath();
+      ctx.arc(px, py, 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  // Stitched inner stationery border
+  ctx.save();
+  ctx.strokeStyle = '#E5D4BE';
+  ctx.lineWidth = 3;
+  ctx.setLineDash([10, 8]);
+  ctx.strokeRect(24, 24, width - 48, height - 48);
+  ctx.restore();
+
+  // Draw Cute Minimalist Quokka & BOBO Duo in Top-Right Header!
+  const drawCuteMascots = (ox: number, oy: number) => {
+    ctx.save();
+    ctx.translate(ox, oy);
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+
+    // BOBO (White Marshmallow Bear on right)
+    ctx.fillStyle = '#FFFDF9';
+    ctx.strokeStyle = '#3E2C1E';
+    ctx.lineWidth = 4.5;
+    // Ears
+    ctx.beginPath();
+    ctx.arc(92, 26, 11, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(136, 26, 11, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    // Head
+    drawRoundRect(82, 24, 64, 68, 30, '#FFFDF9', '#3E2C1E', 4.5);
+    // Eyes & Nose
+    ctx.fillStyle = '#3E2C1E';
+    ctx.beginPath();
+    ctx.arc(104, 53, 3.3, 0, Math.PI * 2);
+    ctx.arc(124, 53, 3.3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#F7B7A9';
+    ctx.beginPath();
+    ctx.ellipse(95, 60, 6, 3.8, 0, 0, Math.PI * 2);
+    ctx.ellipse(133, 60, 6, 3.8, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#3E2C1E';
+    ctx.beginPath();
+    ctx.ellipse(114, 58, 4, 3, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // QUOKKA (Caramel Marsupial on left)
+    ctx.fillStyle = '#BD7B4D';
+    ctx.strokeStyle = '#3E2C1E';
+    ctx.lineWidth = 4.5;
+    ctx.beginPath();
+    ctx.arc(24, 18, 12, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(72, 18, 12, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    drawRoundRect(12, 16, 72, 78, 34, '#BD7B4D', '#3E2C1E', 4.5);
+    // Eyes
+    ctx.fillStyle = '#3E2C1E';
+    ctx.beginPath();
+    ctx.arc(37, 48, 3.6, 0, Math.PI * 2);
+    ctx.arc(59, 48, 3.6, 0, Math.PI * 2);
+    ctx.fill();
+    // Blush
+    ctx.fillStyle = '#EB8B78';
+    ctx.beginPath();
+    ctx.ellipse(26, 56, 7, 4.2, 0, 0, Math.PI * 2);
+    ctx.ellipse(70, 56, 7, 4.2, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Nose & Smile
+    ctx.fillStyle = '#3E2C1E';
+    ctx.beginPath();
+    ctx.ellipse(48, 53, 5, 3.6, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#E56F5E';
+    ctx.beginPath();
+    ctx.moveTo(37, 61);
+    ctx.quadraticCurveTo(48, 75, 59, 61);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.restore();
+  };
+
+  drawCuteMascots(width - 216, 48);
+
+  // 2. Header Title
   const totalSpend = group.expenses.reduce((s, e) => s + e.baseAmount, 0);
-  ctx.fillStyle = '#a5b4fc';
-  ctx.font = '600 24px "Inter", "Noto Sans TC", sans-serif';
-  ctx.fillText('SPLITMATES 好友多人分帳結算單', 56, 70);
+  drawRoundRect(56, 48, 286, 38, 19, '#FCE394', '#3E2C1E', 2.5);
+  ctx.fillStyle = '#4A3525';
+  ctx.font = 'bold 20px "Quicksand", "Zen Maru Gothic", "Noto Sans TC", sans-serif';
+  ctx.fillText('🍪 SPLITMATES 奶油分帳結算單', 74, 74);
 
-  ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 46px "Inter", "Noto Sans TC", sans-serif';
-  ctx.fillText(`${group.coverEmoji} ${group.name}`, 56, 132);
+  ctx.fillStyle = '#3E2C1E';
+  ctx.font = 'bold 44px "Zen Maru Gothic", "Noto Sans TC", sans-serif';
+  ctx.fillText(`${group.coverEmoji} ${group.name}`, 56, 138);
 
-  // Summary Pill Box
+  // Summary Butter Cream Box
   drawRoundRect(
     56,
-    166,
+    170,
     width - 112,
-    126,
-    24,
-    'rgba(255, 255, 255, 0.08)',
-    'rgba(255, 255, 255, 0.16)'
+    132,
+    28,
+    '#FFFDF9',
+    '#3E2C1E',
+    3
   );
 
-  ctx.fillStyle = '#cbd5e1';
-  ctx.font = '500 22px "Inter", "Noto Sans TC", sans-serif';
-  ctx.fillText('群組累計總花費', 90, 212);
-  ctx.fillText('參與人數 / 帳目筆數', 520, 212);
+  ctx.fillStyle = '#8C705A';
+  ctx.font = 'bold 22px "Zen Maru Gothic", "Noto Sans TC", sans-serif';
+  ctx.fillText('群組累計總花費', 90, 216);
+  ctx.fillText('參與好友 / 帳目筆數', 520, 216);
 
-  ctx.fillStyle = '#38bdf8';
-  ctx.font = 'bold 42px "Inter", "Noto Sans TC", sans-serif';
-  ctx.fillText(formatMoney(Math.round(totalSpend), group.baseCurrency), 90, 265);
+  ctx.fillStyle = '#B06D3E';
+  ctx.font = 'bold 42px "Quicksand", "Noto Sans TC", sans-serif';
+  ctx.fillText(formatMoney(Math.round(totalSpend), group.baseCurrency), 90, 272);
 
-  ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 34px "Inter", "Noto Sans TC", sans-serif';
-  ctx.fillText(`${group.members.length} 人 · ${group.expenses.length} 筆消費`, 520, 263);
+  ctx.fillStyle = '#4A3525';
+  ctx.font = 'bold 33px "Zen Maru Gothic", "Noto Sans TC", sans-serif';
+  ctx.fillText(`${group.members.length} 人 · ${group.expenses.length} 筆消費`, 520, 270);
 
-  let cursorY = 330;
+  let cursorY = 334;
 
   // 3. Minimum Transfers Section
   drawRoundRect(
@@ -115,19 +201,22 @@ export function renderSettlementCardToDataUrl(
     cursorY,
     width - 112,
     transfersHeight,
-    24,
-    'rgba(255, 255, 255, 0.96)'
+    28,
+    '#FFFDF9',
+    '#E5D3BD',
+    3
   );
 
-  ctx.fillStyle = '#1e293b';
-  ctx.font = 'bold 28px "Inter", "Noto Sans TC", sans-serif';
+  ctx.fillStyle = '#3E2C1E';
+  ctx.font = 'bold 27px "Zen Maru Gothic", "Noto Sans TC", sans-serif';
   ctx.fillText('⚡ 最少轉帳結算建議 (誰該轉給誰)', 88, cursorY + 52);
 
   let transferY = cursorY + 86;
   if (transfers.length === 0) {
-    ctx.fillStyle = '#059669';
-    ctx.font = 'bold 26px "Inter", "Noto Sans TC", sans-serif';
-    ctx.fillText('🎉 太棒了！目前所有帳目皆已結清，互不相欠！', 88, transferY + 34);
+    drawRoundRect(84, transferY - 6, width - 168, 62, 18, '#EBF4EC', '#C5DEC8', 2);
+    ctx.fillStyle = '#487353';
+    ctx.font = 'bold 25px "Zen Maru Gothic", "Noto Sans TC", sans-serif';
+    ctx.fillText('🎉 太棒了！目前所有帳目皆已結清，互不相欠！', 106, transferY + 34);
   } else {
     transfers.forEach((t, idx) => {
       drawRoundRect(
@@ -135,26 +224,27 @@ export function renderSettlementCardToDataUrl(
         transferY,
         width - 168,
         62,
-        16,
-        idx % 2 === 0 ? '#f1f5f9' : '#f8fafc',
-        '#e2e8f0'
+        18,
+        idx % 2 === 0 ? '#FAF3E8' : '#FFF9EE',
+        '#EADBC8',
+        2
       );
 
-      ctx.fillStyle = '#0f172a';
-      ctx.font = 'bold 25px "Inter", "Noto Sans TC", sans-serif';
+      ctx.fillStyle = '#3E2C1E';
+      ctx.font = 'bold 25px "Zen Maru Gothic", "Noto Sans TC", sans-serif';
       ctx.fillText(`${t.fromMemberName}`, 108, transferY + 40);
 
-      ctx.fillStyle = '#6366f1';
-      ctx.font = 'bold 22px "Inter", "Noto Sans TC", sans-serif';
-      ctx.fillText(`➜ 轉給 ➜`, 280, transferY + 39);
+      ctx.fillStyle = '#B06D3E';
+      ctx.font = 'bold 22px "Zen Maru Gothic", "Noto Sans TC", sans-serif';
+      ctx.fillText('➜ 轉給 ➜', 284, transferY + 39);
 
-      ctx.fillStyle = '#0f172a';
-      ctx.font = 'bold 25px "Inter", "Noto Sans TC", sans-serif';
-      ctx.fillText(`${t.toMemberName}`, 420, transferY + 40);
+      ctx.fillStyle = '#3E2C1E';
+      ctx.font = 'bold 25px "Zen Maru Gothic", "Noto Sans TC", sans-serif';
+      ctx.fillText(`${t.toMemberName}`, 424, transferY + 40);
 
       const amtText = formatMoney(t.amount, group.baseCurrency);
-      ctx.fillStyle = '#e11d48';
-      ctx.font = 'bold 28px "Inter", "Noto Sans TC", sans-serif';
+      ctx.fillStyle = '#C95B49';
+      ctx.font = 'bold 28px "Quicksand", "Noto Sans TC", sans-serif';
       const amtWidth = ctx.measureText(amtText).width;
       ctx.fillText(amtText, width - 112 - amtWidth, transferY + 41);
 
@@ -170,23 +260,24 @@ export function renderSettlementCardToDataUrl(
     cursorY,
     width - 112,
     membersHeight,
-    24,
-    'rgba(255, 255, 255, 0.08)',
-    'rgba(255, 255, 255, 0.14)'
+    28,
+    '#F5EDE0',
+    '#E4D3BE',
+    2.5
   );
 
-  ctx.fillStyle = '#e2e8f0';
-  ctx.font = 'bold 26px "Inter", "Noto Sans TC", sans-serif';
+  ctx.fillStyle = '#4A3525';
+  ctx.font = 'bold 26px "Zen Maru Gothic", "Noto Sans TC", sans-serif';
   ctx.fillText('📊 每人消費與先墊統計', 88, cursorY + 50);
 
   let memY = cursorY + 84;
   balances.forEach((b) => {
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 24px "Inter", "Noto Sans TC", sans-serif';
+    ctx.fillStyle = '#3E2C1E';
+    ctx.font = 'bold 24px "Zen Maru Gothic", "Noto Sans TC", sans-serif';
     ctx.fillText(b.memberName, 88, memY + 34);
 
-    ctx.fillStyle = '#94a3b8';
-    ctx.font = '500 20px "Inter", "Noto Sans TC", sans-serif';
+    ctx.fillStyle = '#826752';
+    ctx.font = '600 20px "Zen Maru Gothic", "Noto Sans TC", sans-serif';
     ctx.fillText(
       `應分攤 ${formatMoney(Math.round(b.totalOwed), group.baseCurrency)} ｜ 已先墊 ${formatMoney(
         Math.round(b.totalPaid),
@@ -204,8 +295,8 @@ export function renderSettlementCardToDataUrl(
         : '已結清';
 
     ctx.fillStyle =
-      b.netBalance > 0 ? '#34d399' : b.netBalance < 0 ? '#fb7185' : '#cbd5e1';
-    ctx.font = 'bold 22px "Inter", "Noto Sans TC", sans-serif';
+      b.netBalance > 0 ? '#4B7A57' : b.netBalance < 0 ? '#C95B49' : '#8C705A';
+    ctx.font = 'bold 22px "Quicksand", "Noto Sans TC", sans-serif';
     const netW = ctx.measureText(netStr).width;
     ctx.fillText(netStr, width - 92 - netW, memY + 34);
 
@@ -221,18 +312,19 @@ export function renderSettlementCardToDataUrl(
       cursorY,
       width - 112,
       paymentSectionHeight,
-      20,
-      'rgba(16, 185, 129, 0.12)',
-      'rgba(16, 185, 129, 0.3)'
+      24,
+      '#FFF8E3',
+      '#EBD494',
+      2.5
     );
-    ctx.fillStyle = '#6ee7b7';
-    ctx.font = 'bold 23px "Inter", "Noto Sans TC", sans-serif';
-    ctx.fillText('🏦 收款帳號與轉帳方式', 88, cursorY + 44);
+    ctx.fillStyle = '#7A531E';
+    ctx.font = 'bold 23px "Zen Maru Gothic", "Noto Sans TC", sans-serif';
+    ctx.fillText('🏦 收款帳號與轉帳方式', 88, cursorY + 46);
 
-    let payY = cursorY + 82;
+    let payY = cursorY + 84;
     paymentMembers.forEach((m) => {
-      ctx.fillStyle = '#f8fafc';
-      ctx.font = '500 21px "Inter", "Noto Sans TC", sans-serif';
+      ctx.fillStyle = '#4A3525';
+      ctx.font = '600 21px "Zen Maru Gothic", "Noto Sans TC", sans-serif';
       ctx.fillText(`• ${m.name}：${m.paymentInfo}`, 88, payY);
       payY += 42;
     });
@@ -245,12 +337,12 @@ export function renderSettlementCardToDataUrl(
     month: '2-digit',
     day: '2-digit',
   });
-  ctx.fillStyle = '#94a3b8';
-  ctx.font = '500 20px "Inter", "Noto Sans TC", sans-serif';
+  ctx.fillStyle = '#967B65';
+  ctx.font = '600 20px "Zen Maru Gothic", "Noto Sans TC", sans-serif';
   ctx.fillText(
-    `由 SplitMates 分帳好夥伴自動產生 · 支援 LINE & IG 即時分帳 · ${nowStr}`,
+    `🍪 SplitMates 奶油分帳本 · Quokka & BOBO 陪你開心出遊分帳 · ${nowStr}`,
     56,
-    height - 36
+    height - 42
   );
 
   return canvas.toDataURL('image/png');

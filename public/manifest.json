@@ -1,9 +1,22 @@
 {
-  "name": "SplitMates 分帳好夥伴",
-  "short_name": "SplitMates",
-  "description": "LINE & IG 好友多人即時分帳平台",
+  "name": "SplitMates 奶油分帳本",
+  "short_name": "奶油分帳",
+  "description": "Quokka & BOBO 簡約奶油風 LINE & IG 好友多人即時分帳",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#f8fafc",
-  "theme_color": "#4f46e5"
+  "background_color": "#FAF6EE",
+  "theme_color": "#FAF6EE",
+  "icons": [
+    {
+      "src": "./apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
 }

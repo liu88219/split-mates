@@ -16,6 +16,7 @@ import {
 } from '../services/cloudSync';
 import { getActiveLiffId, saveCustomLiffId } from '../services/liffService';
 import { CURRENCY_LIST, getDefaultExchangeRate } from '../utils/currencies';
+import { BoboFaceBadge } from './QuokkaBoboArt';
 
 interface CloudSettingsModalProps {
   isOpen: boolean;
@@ -96,17 +97,19 @@ export const CloudSettingsModal: React.FC<CloudSettingsModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-900/60 backdrop-blur-sm p-0 sm:p-4 overflow-y-auto">
-      <div className="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
-        <div className="px-5 py-4 bg-slate-900 text-white flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-2">
-            <Cloud className="w-5 h-5 text-sky-400" />
-            <h2 className="text-lg font-bold">⚙️ 雲端同步、LINE LIFF 與匯率設定</h2>
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-[#3E2C1E]/45 backdrop-blur-sm p-0 sm:p-4 overflow-y-auto">
+      <div className="bg-[#FFFDF9] w-full max-w-lg rounded-t-3xl sm:rounded-3xl border-2 border-[#3E2C1E] shadow-[0_8px_0_#3E2C1E] overflow-hidden flex flex-col max-h-[92vh]">
+        <div className="px-5 py-4 bg-[#FAF1E2] border-b-2 border-[#E6D4BE] text-[#3E2C1E] flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-2.5">
+            <BoboFaceBadge className="w-8 h-8 shrink-0" />
+            <h2 className="text-base sm:text-lg font-extrabold tracking-tight">
+              ⚙️ 匯率、雲端同步與 LIFF 設定
+            </h2>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-full hover:bg-white/20 transition"
+            className="p-1.5 rounded-full hover:bg-[#EADBC8]/60 text-[#5C4432] transition"
           >
             <X className="w-5 h-5" />
           </button>
@@ -114,7 +117,7 @@ export const CloudSettingsModal: React.FC<CloudSettingsModalProps> = ({
 
         <form onSubmit={handleSaveAll} className="p-5 overflow-y-auto space-y-6 flex-1">
           {savedNotice && (
-            <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm font-bold flex items-center gap-2">
+            <div className="p-3 rounded-2xl bg-[#EAF4EC] border-2 border-[#B8D8BF] text-[#356340] text-sm font-extrabold flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4" />
               <span>{savedNotice}</span>
             </div>
@@ -124,8 +127,8 @@ export const CloudSettingsModal: React.FC<CloudSettingsModalProps> = ({
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
-                <Globe className="w-4 h-4 text-indigo-600" />
-                <h3 className="text-sm font-bold text-slate-900">
+                <Globe className="w-4 h-4 text-[#B06D3E]" />
+                <h3 className="text-sm font-extrabold text-[#3E2C1E]">
                   1. 出國多幣別匯率設定（基準幣：{group.baseCurrency}）
                 </h3>
               </div>
@@ -137,7 +140,7 @@ export const CloudSettingsModal: React.FC<CloudSettingsModalProps> = ({
                   await onRefreshLiveRates();
                   setIsRefreshingRates(false);
                 }}
-                className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1"
+                className="text-xs font-extrabold text-[#B06D3E] hover:text-[#8F4D22] flex items-center gap-1"
               >
                 <RefreshCw
                   className={`w-3.5 h-3.5 ${isRefreshingRates ? 'animate-spin' : ''}`}
@@ -145,7 +148,7 @@ export const CloudSettingsModal: React.FC<CloudSettingsModalProps> = ({
                 更新即時匯率
               </button>
             </div>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-[#7A624E]">
               可為本群組鎖定固定旅遊匯率（例如日幣固定算 0.215），留空則自動採用即時匯率：
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
@@ -155,9 +158,9 @@ export const CloudSettingsModal: React.FC<CloudSettingsModalProps> = ({
                 return (
                   <div
                     key={c.code}
-                    className="p-2.5 rounded-xl bg-slate-50 border border-slate-200"
+                    className="p-2.5 rounded-2xl bg-[#FAF6EE] border border-[#E6D6C3]"
                   >
-                    <div className="text-xs font-bold text-slate-700 mb-1">
+                    <div className="text-xs font-bold text-[#4A3525] mb-1">
                       {c.flag} 1 {c.code} = ? {group.baseCurrency}
                     </div>
                     <input
@@ -175,7 +178,7 @@ export const CloudSettingsModal: React.FC<CloudSettingsModalProps> = ({
                         setCustomRates(next);
                       }}
                       placeholder={`即時 ${defaultVal}`}
-                      className="w-full px-2.5 py-1 rounded-lg border border-slate-300 bg-white text-xs font-semibold"
+                      className="w-full px-2.5 py-1.5 text-xs font-bold cream-input"
                     />
                   </div>
                 );
@@ -183,29 +186,38 @@ export const CloudSettingsModal: React.FC<CloudSettingsModalProps> = ({
             </div>
           </div>
 
-          <hr className="border-slate-200" />
+          <hr className="border-[#EADCCB]" />
 
           {/* Section 2: Firebase Cloud Realtime Sync */}
           <div className="space-y-3">
             <div className="flex items-center gap-1.5">
-              <Cloud className="w-4 h-4 text-sky-600" />
-              <h3 className="text-sm font-bold text-slate-900">
-                2. Firebase Firestore 雲端即時共同編輯（選填）
+              <Cloud className="w-4 h-4 text-[#6B8FA3]" />
+              <h3 className="text-sm font-extrabold text-[#3E2C1E]">
+                2. 自訂 Firebase Firestore 進階同步（選填，預設已內建免設定雲端同步）
               </h3>
             </div>
-            <p className="text-xs text-slate-500 leading-relaxed">
-              至 <a href="https://console.firebase.google.com/" target="_blank" rel="noreferrer" className="text-indigo-600 underline">Firebase Console</a> 建立免費專案並啟用 <strong>Cloud Firestore</strong> 後，可直接把 <code>firebaseConfig</code> 貼在下方，自動解析：
+            <p className="text-xs text-[#7A624E] leading-relaxed">
+              App 已內建免設定的永久雲端同步！若想改用自己的{' '}
+              <a
+                href="https://console.firebase.google.com/"
+                target="_blank"
+                rel="noreferrer"
+                className="text-[#B06D3E] font-bold underline"
+              >
+                Firebase Console
+              </a>{' '}
+              專案，可將 <code>firebaseConfig</code> 貼在下方自動解析：
             </p>
             <textarea
               rows={3}
               value={rawJsonInput}
               onChange={(e) => handleParseFirebaseSnippet(e.target.value)}
               placeholder={`直接貼上 Firebase SDK 片段，例如：\nconst firebaseConfig = { apiKey: "AIza...", projectId: "my-split-app" };`}
-              className="w-full p-2.5 rounded-xl bg-slate-50 border border-slate-300 text-xs font-mono"
+              className="w-full p-2.5 text-xs font-mono cream-input"
             />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <div>
-                <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                <label className="block text-[11px] font-bold text-[#6E5643] mb-1">
                   Firebase apiKey
                 </label>
                 <input
@@ -213,11 +225,11 @@ export const CloudSettingsModal: React.FC<CloudSettingsModalProps> = ({
                   value={apiKey}
                   onChange={(e) => setApiKey(e.target.value)}
                   placeholder="AIzaSy..."
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-mono"
+                  className="w-full px-3 py-2 text-xs font-mono cream-input"
                 />
               </div>
               <div>
-                <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                <label className="block text-[11px] font-bold text-[#6E5643] mb-1">
                   Firebase projectId
                 </label>
                 <input
@@ -225,23 +237,23 @@ export const CloudSettingsModal: React.FC<CloudSettingsModalProps> = ({
                   value={projectId}
                   onChange={(e) => setProjectId(e.target.value)}
                   placeholder="my-bill-split-id"
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-mono"
+                  className="w-full px-3 py-2 text-xs font-mono cream-input"
                 />
               </div>
             </div>
           </div>
 
-          <hr className="border-slate-200" />
+          <hr className="border-[#EADCCB]" />
 
           {/* Section 3: LINE LIFF SDK */}
           <div className="space-y-2.5">
             <div className="flex items-center gap-1.5">
               <MessageSquare className="w-4 h-4 text-[#06C755]" />
-              <h3 className="text-sm font-bold text-slate-900">
+              <h3 className="text-sm font-extrabold text-[#3E2C1E]">
                 3. LINE LIFF ID 整合（選填）
               </h3>
             </div>
-            <p className="text-xs text-slate-500 leading-relaxed">
+            <p className="text-xs text-[#7A624E] leading-relaxed">
               若在 LINE Developers 建立 LIFF App 並將 Endpoint URL 指向妳的 GitHub Pages 網址，填入 LIFF ID 後即可在 LINE 內自動帶入個人頭像與發送 Flex Message 卡片：
             </p>
             <input
@@ -249,7 +261,7 @@ export const CloudSettingsModal: React.FC<CloudSettingsModalProps> = ({
               value={liffId}
               onChange={(e) => setLiffId(e.target.value)}
               placeholder="例如：2001234567-AbCdEfGh"
-              className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-mono"
+              className="w-full px-3.5 py-2 text-xs font-mono cream-input"
             />
           </div>
 
@@ -257,13 +269,13 @@ export const CloudSettingsModal: React.FC<CloudSettingsModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2.5 rounded-2xl border border-slate-300 text-slate-700 font-semibold text-sm"
+              className="flex-1 py-2.5 rounded-2xl font-bold text-sm btn-bobo"
             >
               取消
             </button>
             <button
               type="submit"
-              className="flex-[2] py-2.5 rounded-2xl bg-indigo-600 text-white font-bold text-sm hover:bg-indigo-700 transition flex items-center justify-center gap-1.5"
+              className="flex-[2] py-2.5 rounded-2xl font-extrabold text-sm flex items-center justify-center gap-1.5 btn-quokka"
             >
               <Save className="w-4 h-4" />
               儲存設定
