@@ -1,11 +1,11 @@
 {
   "name": "SplitMates 奶油分帳本",
   "short_name": "奶油分帳",
-  "description": "Quokka & BOBO 簡約奶油風 LINE & IG 好友多人即時分帳",
+  "description": "Dinotaeng Quokka & BOBO 簡約奶油風 LINE & IG 好友多人即時分帳",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#FAF6EE",
-  "theme_color": "#FAF6EE",
+  "background_color": "#ECE8DF",
+  "theme_color": "#ECE8DF",
   "icons": [
     {
       "src": "./apple-touch-icon.png",

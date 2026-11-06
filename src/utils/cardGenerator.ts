@@ -54,130 +54,105 @@ export function renderSettlementCardToDataUrl(
     }
   };
 
-  // 1. Warm Creamy Oatmeal Canvas Background
-  ctx.fillStyle = '#FAF5EB';
+  // 1. Authentic Dinotaeng Warm Oatmeal-Cream Matte Paper Canvas
+  ctx.fillStyle = '#ECE8DF';
   ctx.fillRect(0, 0, width, height);
 
-  // Subtle polka-dot stationery pattern
-  ctx.fillStyle = 'rgba(189, 123, 77, 0.08)';
-  for (let py = 28; py < height; py += 36) {
-    for (let px = 28; px < width; px += 36) {
-      ctx.beginPath();
-      ctx.arc(px, py, 2, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
+  // Soft Matte Cream Stationery Frame
+  drawRoundRect(24, 24, width - 48, height - 48, 36, '#FAF8F3', '#DDD7C9', 2);
 
-  // Stitched inner stationery border
-  ctx.save();
-  ctx.strokeStyle = '#E5D4BE';
-  ctx.lineWidth = 3;
-  ctx.setLineDash([10, 8]);
-  ctx.strokeRect(24, 24, width - 48, height - 48);
-  ctx.restore();
-
-  // Draw Cute Minimalist Quokka & BOBO Duo in Top-Right Header!
+  // Draw Authentic Lineless Dinotaeng Quokka & Snow-White BOBO Duo in Top-Right Header!
   const drawCuteMascots = (ox: number, oy: number) => {
     ctx.save();
     ctx.translate(ox, oy);
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';
 
-    // BOBO (White Marshmallow Bear on right)
-    ctx.fillStyle = '#FFFDF9';
-    ctx.strokeStyle = '#3E2C1E';
-    ctx.lineWidth = 4.5;
-    // Ears
+    // Warm Butter-Yellow Dinotaeng Stage Pill so snow-white lineless BOBO pops cleanly
+    drawRoundRect(0, 4, 162, 100, 28, '#F2CA62');
+
+    // QUOKKA (Left: solid caramel fur + denim overalls, NO dark outline, NO blush)
+    ctx.fillStyle = '#C48E63';
     ctx.beginPath();
-    ctx.arc(92, 26, 11, 0, Math.PI * 2);
+    ctx.arc(34, 28, 10, 0, Math.PI * 2);
+    ctx.arc(62, 28, 10, 0, Math.PI * 2);
     ctx.fill();
-    ctx.stroke();
+    drawRoundRect(22, 24, 52, 50, 23, '#C48E63');
+    drawRoundRect(24, 64, 48, 32, 16, '#C48E63');
+    // Denim Overalls (#2C4268)
+    drawRoundRect(25, 72, 46, 23, 8, '#2C4268');
+    drawRoundRect(33, 63, 7, 13, 3, '#2C4268');
+    drawRoundRect(56, 63, 7, 13, 3, '#2C4268');
+    // Black Feet
+    ctx.fillStyle = '#14110F';
     ctx.beginPath();
-    ctx.arc(136, 26, 11, 0, Math.PI * 2);
+    ctx.ellipse(36, 97, 8, 3.5, 0, 0, Math.PI * 2);
+    ctx.ellipse(60, 97, 8, 3.5, 0, 0, Math.PI * 2);
     ctx.fill();
-    ctx.stroke();
-    // Head
-    drawRoundRect(82, 24, 64, 68, 30, '#FFFDF9', '#3E2C1E', 4.5);
-    // Eyes & Nose
-    ctx.fillStyle = '#3E2C1E';
+    // Quokka Face: close-set eyes + vertical black bean nose + happy open mouth with coral tongue
+    ctx.fillStyle = '#14110F';
     ctx.beginPath();
-    ctx.arc(104, 53, 3.3, 0, Math.PI * 2);
-    ctx.arc(124, 53, 3.3, 0, Math.PI * 2);
+    ctx.ellipse(42, 41, 2.3, 2.9, 0, 0, Math.PI * 2);
+    ctx.ellipse(54, 41, 2.3, 2.9, 0, 0, Math.PI * 2);
+    ctx.ellipse(48, 49, 4, 5.4, 0, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillStyle = '#F7B7A9';
     ctx.beginPath();
-    ctx.ellipse(95, 60, 6, 3.8, 0, 0, Math.PI * 2);
-    ctx.ellipse(133, 60, 6, 3.8, 0, 0, Math.PI * 2);
+    ctx.arc(48, 57, 5.2, 0, Math.PI);
     ctx.fill();
-    ctx.fillStyle = '#3E2C1E';
+    ctx.fillStyle = '#E37A70';
     ctx.beginPath();
-    ctx.ellipse(114, 58, 4, 3, 0, 0, Math.PI * 2);
+    ctx.ellipse(48, 60.2, 3, 1.5, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // QUOKKA (Caramel Marsupial on left)
-    ctx.fillStyle = '#BD7B4D';
-    ctx.strokeStyle = '#3E2C1E';
-    ctx.lineWidth = 4.5;
+    // BOBO (Right: pure snow-white gummy bear, NO dark outline, NO blush)
+    ctx.fillStyle = '#FFFFFF';
     ctx.beginPath();
-    ctx.arc(24, 18, 12, 0, Math.PI * 2);
+    ctx.arc(103, 43, 7.5, 0, Math.PI * 2);
+    ctx.arc(131, 43, 7.5, 0, Math.PI * 2);
     ctx.fill();
-    ctx.stroke();
+    drawRoundRect(94, 42, 46, 36, 18, '#FFFFFF');
+    drawRoundRect(93, 66, 48, 31, 16, '#FFFFFF');
+    // BOBO Face: close-set dot eyes + tiny nose + w mouth
+    ctx.fillStyle = '#14110F';
     ctx.beginPath();
-    ctx.arc(72, 18, 12, 0, Math.PI * 2);
+    ctx.ellipse(112, 56, 1.9, 2.3, 0, 0, Math.PI * 2);
+    ctx.ellipse(122, 56, 1.9, 2.3, 0, 0, Math.PI * 2);
+    ctx.ellipse(117, 61, 2.3, 1.7, 0, 0, Math.PI * 2);
     ctx.fill();
-    ctx.stroke();
-    drawRoundRect(12, 16, 72, 78, 34, '#BD7B4D', '#3E2C1E', 4.5);
-    // Eyes
-    ctx.fillStyle = '#3E2C1E';
+    ctx.strokeStyle = '#14110F';
+    ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.arc(37, 48, 3.6, 0, Math.PI * 2);
-    ctx.arc(59, 48, 3.6, 0, Math.PI * 2);
-    ctx.fill();
-    // Blush
-    ctx.fillStyle = '#EB8B78';
-    ctx.beginPath();
-    ctx.ellipse(26, 56, 7, 4.2, 0, 0, Math.PI * 2);
-    ctx.ellipse(70, 56, 7, 4.2, 0, 0, Math.PI * 2);
-    ctx.fill();
-    // Nose & Smile
-    ctx.fillStyle = '#3E2C1E';
-    ctx.beginPath();
-    ctx.ellipse(48, 53, 5, 3.6, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#E56F5E';
-    ctx.beginPath();
-    ctx.moveTo(37, 61);
-    ctx.quadraticCurveTo(48, 75, 59, 61);
-    ctx.closePath();
-    ctx.fill();
+    ctx.moveTo(112, 64);
+    ctx.quadraticCurveTo(114.5, 67.5, 117, 64.2);
+    ctx.quadraticCurveTo(119.5, 67.5, 122, 64);
     ctx.stroke();
 
     ctx.restore();
   };
 
-  drawCuteMascots(width - 216, 48);
+  drawCuteMascots(width - 218, 48);
 
   // 2. Header Title
   const totalSpend = group.expenses.reduce((s, e) => s + e.baseAmount, 0);
-  drawRoundRect(56, 48, 286, 38, 19, '#FCE394', '#3E2C1E', 2.5);
-  ctx.fillStyle = '#4A3525';
+  drawRoundRect(56, 52, 296, 38, 19, '#F2CA62');
+  ctx.fillStyle = '#2D251E';
   ctx.font = 'bold 20px "Quicksand", "Zen Maru Gothic", "Noto Sans TC", sans-serif';
-  ctx.fillText('🍪 SPLITMATES 奶油分帳結算單', 74, 74);
+  ctx.fillText('🧈 SPLITMATES 奶油分帳結算單', 74, 77);
 
-  ctx.fillStyle = '#3E2C1E';
+  ctx.fillStyle = '#2D251E';
   ctx.font = 'bold 44px "Zen Maru Gothic", "Noto Sans TC", sans-serif';
-  ctx.fillText(`${group.coverEmoji} ${group.name}`, 56, 138);
+  ctx.fillText(`${group.coverEmoji} ${group.name}`, 56, 140);
 
-  // Summary Butter Cream Box
+  // Summary Matte Oatmeal Box
   drawRoundRect(
     56,
     170,
     width - 112,
     132,
     28,
-    '#FFFDF9',
-    '#3E2C1E',
-    3
+    '#EFECE4',
+    '#DDD7C9',
+    2
   );
 
   ctx.fillStyle = '#8C705A';

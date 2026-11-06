@@ -5,30 +5,28 @@
 @layer base {
   body {
     -webkit-tap-highlight-color: transparent;
-    background-color: #FAF6EE;
-    color: #4A3525;
-    background-image: radial-gradient(rgba(176, 109, 62, 0.055) 1px, transparent 1px);
-    background-size: 22px 22px;
+    background-color: #ECE8DF;
+    color: #2D251E;
   }
 }
 
 @layer components {
   .cream-card {
-    @apply bg-[#FFFDF9] border-2 border-[#E9DCCB] rounded-3xl shadow-[0_4px_0_#EAE0D2];
+    @apply bg-[#FAF8F3] border border-[#DDD7C9] rounded-3xl shadow-[0_8px_24px_-6px_rgba(60,48,36,0.07)];
   }
   .cream-card-soft {
-    @apply bg-[#FFFDF9] border border-[#EADCCB] rounded-2xl shadow-[0_2px_10px_rgba(74,53,37,0.04)];
+    @apply bg-[#FAF8F3] border border-[#E2DDD1] rounded-2xl shadow-[0_4px_14px_-4px_rgba(60,48,36,0.05)];
   }
   .cream-input {
-    @apply bg-[#FFFDF9] border-2 border-[#E5D5C1] text-[#4A3525] placeholder:text-[#B39B86] rounded-2xl focus:border-[#B06D3E] focus:ring-2 focus:ring-[#F5DFC6] outline-none transition;
+    @apply bg-[#FAF8F3] border border-[#D8D1C3] text-[#2D251E] placeholder:text-[#9A8F82] rounded-2xl focus:border-[#C48E63] focus:ring-2 focus:ring-[#F2CA62]/40 outline-none transition;
   }
   .btn-quokka {
-    @apply bg-[#B06D3E] hover:bg-[#9C5E33] text-[#FFFDF9] border-2 border-[#4A3525] shadow-[0_3px_0_#4A3525] active:translate-y-[1px] active:shadow-[0_1px_0_#4A3525] transition-all;
+    @apply bg-[#C48E63] hover:bg-[#B47E54] text-[#FFFDF9] rounded-2xl shadow-[0_3px_0_rgba(30,24,20,0.14)] active:translate-y-[1px] active:shadow-none transition-all;
   }
   .btn-butter {
-    @apply bg-[#FCE394] hover:bg-[#F9D876] text-[#4A3525] border-2 border-[#4A3525] shadow-[0_3px_0_#4A3525] active:translate-y-[1px] active:shadow-[0_1px_0_#4A3525] transition-all;
+    @apply bg-[#F2CA62] hover:bg-[#E7BD52] text-[#2D251E] rounded-2xl shadow-[0_3px_0_rgba(140,104,24,0.18)] active:translate-y-[1px] active:shadow-none transition-all;
   }
   .btn-bobo {
-    @apply bg-[#FFFDF9] hover:bg-[#F6EFE4] text-[#4A3525] border-2 border-[#D9C7B2] shadow-[0_2px_0_#DFD0BE] active:translate-y-[1px] active:shadow-none transition-all;
+    @apply bg-[#FAF8F3] hover:bg-[#EFECE4] text-[#2D251E] border border-[#DDD7C9] rounded-2xl shadow-[0_2px_0_#E2DDD1] active:translate-y-[1px] active:shadow-none transition-all;
   }
 }

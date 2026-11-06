@@ -793,9 +793,9 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen pb-28 text-[#4A3525]">
-      {/* Top App Bar: Minimalist Creamy Stationery Bar — current group on left; Share + private Owner Admin button on right */}
-      <header className="sticky top-0 z-30 bg-[#FFFDF9]/95 backdrop-blur-md text-[#3E2C1E] border-b-2 border-[#EADCCB]">
+    <div className="min-h-screen pb-28 text-[#2D251E]">
+      {/* Top App Bar: Authentic Dinotaeng Minimalist Creamy Matte Bar */}
+      <header className="sticky top-0 z-30 bg-[#FAF8F3]/95 backdrop-blur-md text-[#2D251E] border-b border-[#DDD7C9]">
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
           {/* Left: Current Group Avatar + Quokka Accent & Title */}
           <div className="flex items-center gap-2.5 min-w-0">
@@ -803,15 +803,15 @@ export const App: React.FC = () => {
               <img
                 src={activeGroup.coverImageUrl}
                 alt={activeGroup.name}
-                className="w-9 h-9 rounded-2xl object-cover border-2 border-[#3E2C1E] shadow-[0_2px_0_#3E2C1E] shrink-0"
+                className="w-9 h-9 rounded-2xl object-cover border border-[#DDD7C9] shrink-0"
               />
             ) : (
-              <div className="w-9 h-9 rounded-2xl bg-[#FCE394] border-2 border-[#3E2C1E] shadow-[0_2px_0_#3E2C1E] flex items-center justify-center text-lg shrink-0">
+              <div className="w-9 h-9 rounded-2xl bg-[#F2CA62] flex items-center justify-center text-lg shrink-0">
                 {activeGroup.coverEmoji}
               </div>
             )}
 
-            <span className="font-extrabold text-base sm:text-lg text-[#3E2C1E] truncate">
+            <span className="font-extrabold text-base sm:text-lg text-[#2D251E] truncate">
               {activeGroup.name}
             </span>
           </div>
@@ -821,7 +821,7 @@ export const App: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsShareModalOpen(true)}
-              className="px-3.5 py-1.5 rounded-xl bg-[#FCE394] hover:bg-[#F9D876] text-[#3E2C1E] border-2 border-[#3E2C1E] shadow-[0_2px_0_#3E2C1E] active:translate-y-[1px] active:shadow-none text-xs font-extrabold flex items-center gap-1.5 transition"
+              className="px-3.5 py-1.5 rounded-xl bg-[#F2CA62] hover:bg-[#E7BD52] text-[#2D251E] shadow-[0_2px_0_rgba(140,104,24,0.18)] active:translate-y-[1px] active:shadow-none text-xs font-extrabold flex items-center gap-1.5 transition"
             >
               <Share2 className="w-3.5 h-3.5" />
               <span>LINE / IG 分享</span>
@@ -832,9 +832,9 @@ export const App: React.FC = () => {
                 type="button"
                 onClick={handleOpenOwnerAdmin}
                 title="管理員專屬：我的所有群組 / 封存 / 編輯與設定"
-                className="px-2.5 py-1.5 rounded-xl bg-[#F5ECE0] hover:bg-[#EDE0CF] text-[#5C402B] text-xs font-extrabold flex items-center gap-1 border-2 border-[#D9C6B0] transition"
+                className="px-2.5 py-1.5 rounded-xl bg-[#EFECE4] hover:bg-[#E4E0D6] text-[#2D251E] text-xs font-extrabold flex items-center gap-1 border border-[#DDD7C9] transition"
               >
-                <Crown className="w-3.5 h-3.5 text-[#B06D3E]" />
+                <Crown className="w-3.5 h-3.5 text-[#C48E63]" />
                 <span>我的帳本</span>
               </button>
             )}
@@ -845,12 +845,12 @@ export const App: React.FC = () => {
       {/* Toast Notification Banner */}
       {bannerNotice && (
         <div className="max-w-3xl mx-auto px-4 mt-3">
-          <div className="px-4 py-2.5 rounded-2xl bg-[#4A3525] text-[#FFFDF9] border-2 border-[#3E2C1E] text-xs font-bold shadow-[0_3px_0_#2D1F15] flex items-center justify-between">
+          <div className="px-4 py-2.5 rounded-2xl bg-[#2D251E] text-[#FAF8F3] text-xs font-bold shadow-md flex items-center justify-between">
             <span>{bannerNotice}</span>
             <button
               type="button"
               onClick={() => setBannerNotice(null)}
-              className="text-[#FCE394] hover:text-white ml-2 font-extrabold"
+              className="text-[#F2CA62] hover:text-white ml-2 font-extrabold"
             >
               ✕
             </button>
@@ -860,12 +860,12 @@ export const App: React.FC = () => {
 
       {/* Main Content Container (Strictly ONLY the current group!) */}
       <main className="max-w-3xl mx-auto px-4 pt-4 space-y-4">
-        {/* Hero Overview Card: Quokka & BOBO Minimalist Creamy Stationery */}
-        <section className="relative overflow-hidden rounded-[28px] bg-gradient-to-br from-[#FFFDF9] via-[#FFF9EC] to-[#F7EBDA] text-[#3E2C1E] p-5 sm:p-6 border-2 border-[#3E2C1E] shadow-[0_5px_0_#DFCEB9]">
+        {/* Hero Overview Card: Dinotaeng Quokka & BOBO Minimalist Creamy Stationery */}
+        <section className="relative overflow-hidden rounded-[28px] bg-[#FAF8F3] text-[#2D251E] p-5 sm:p-6 border border-[#DDD7C9] shadow-[0_10px_28px_-6px_rgba(60,48,36,0.07)]">
           <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="space-y-2 min-w-0">
               <div className="flex flex-wrap items-center gap-1.5">
-                <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#F4E8D8] border border-[#E2CEB7] text-[#6E5039] text-xs font-bold">
+                <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#EFECE4] border border-[#DDD7C9] text-[#5C5044] text-xs font-bold">
                   <span>基準結算：{activeGroup.baseCurrency}</span>
                   <span>·</span>
                   <span>{activeGroup.members.length} 位好友分帳</span>
@@ -897,7 +897,7 @@ export const App: React.FC = () => {
                     await runOwnerVaultSync();
                     showNotice('☁️ 已完成跨瀏覽器與分享連結永久雲端同步！');
                   }}
-                  className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#EBF4EC] hover:bg-[#DCEBDD] border border-[#C3DEC7] text-[#426E4D] text-xs font-bold transition"
+                  className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#EBF3EC] hover:bg-[#DCEADC] border border-[#C6DEC8] text-[#3F6949] text-xs font-bold transition"
                 >
                   <RotateCcw className="w-3 h-3" />
                   <span>雲端即時同步</span>
@@ -910,24 +910,24 @@ export const App: React.FC = () => {
                     <img
                       src={activeGroup.coverImageUrl}
                       alt={activeGroup.name}
-                      className="w-12 h-12 rounded-2xl object-cover border-2 border-[#3E2C1E] shadow-[0_2px_0_#3E2C1E] shrink-0"
+                      className="w-12 h-12 rounded-2xl object-cover border border-[#DDD7C9] shrink-0"
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-2xl bg-[#FFF3C4] border-2 border-[#3E2C1E] shadow-[0_2px_0_#3E2C1E] flex items-center justify-center text-2xl shrink-0">
+                    <div className="w-12 h-12 rounded-2xl bg-[#F2CA62] flex items-center justify-center text-2xl shrink-0">
                       {activeGroup.coverEmoji}
                     </div>
                   )}
                   <div className="min-w-0">
-                    <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-[#3E2C1E] truncate">
+                    <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-[#2D251E] truncate">
                       {activeGroup.name}
                     </h1>
                     {activeGroup.description ? (
-                      <p className="text-xs text-[#7D624E] mt-0.5 line-clamp-2">
+                      <p className="text-xs text-[#6E6155] mt-0.5 line-clamp-2">
                         {activeGroup.description}
                       </p>
                     ) : (
-                      <p className="text-xs text-[#8C705A] mt-0.5">
-                        Quokka &amp; BOBO 陪大家輕鬆記帳不傷感情 🍪
+                      <p className="text-xs text-[#7D7063] mt-0.5">
+                        Quokka &amp; BOBO 陪大家輕鬆記帳不傷感情 🧈
                       </p>
                     )}
                   </div>
@@ -942,12 +942,12 @@ export const App: React.FC = () => {
               {/* Desktop Quokka & BOBO Mascot Duo */}
               <QuokkaBoboHeroDuo className="w-28 h-20 shrink-0 hidden sm:block" />
 
-              <div className="flex-1 sm:flex-initial sm:text-right bg-[#FFFDF9] rounded-2xl p-3.5 border-2 border-[#E6D4BE] shadow-[0_3px_0_#EADBC8]">
-                <div className="text-xs font-bold text-[#8C705A]">群組累計總花費</div>
-                <div className="text-2xl sm:text-3xl font-extrabold text-[#B06D3E] mt-0.5">
+              <div className="flex-1 sm:flex-initial sm:text-right bg-[#EFECE4] rounded-2xl p-3.5 border border-[#DDD7C9]">
+                <div className="text-xs font-bold text-[#6E6155]">群組累計總花費</div>
+                <div className="text-2xl sm:text-3xl font-extrabold text-[#B07648] mt-0.5">
                   {formatMoney(Math.round(totalSpendBase), activeGroup.baseCurrency)}
                 </div>
-                <div className="text-xs text-[#7D624E] mt-0.5 font-medium">
+                <div className="text-xs text-[#6E6155] mt-0.5 font-medium">
                   平均每人約{' '}
                   {formatMoney(
                     Math.round(
@@ -962,7 +962,7 @@ export const App: React.FC = () => {
           </div>
 
           {/* Quick Action Strip inside Hero */}
-          <div className="relative z-10 mt-4 pt-3.5 border-t-2 border-dashed border-[#E6D5C1] flex flex-wrap items-center justify-between gap-2.5">
+          <div className="relative z-10 mt-4 pt-3.5 border-t border-dashed border-[#DDD7C9] flex flex-wrap items-center justify-between gap-2.5">
             <div className="flex items-center -space-x-1.5 overflow-hidden">
               {activeGroup.members.map((m, idx) => (
                 <div
