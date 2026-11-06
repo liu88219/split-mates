@@ -14,10 +14,17 @@ import {
   KeyRound,
   RotateCcw,
   CheckCircle2,
+  Download,
+  Upload,
+  ShieldCheck,
 } from 'lucide-react';
 import LZString from 'lz-string';
 import { BillGroup } from '../types/bill';
 import { formatMoney } from '../utils/currencies';
+import {
+  exportAllGroupsJson,
+  parseImportedGroupsJson,
+} from '../services/cloudSync';
 
 const OWNER_UNLOCKED_KEY = 'splitmates_owner_unlocked_v2';
 const OWNER_PASSHASH_KEY = 'splitmates_owner_passhash_v1';
@@ -82,6 +89,7 @@ interface OwnerAdminModalProps {
   onDeleteGroup: (groupId: string) => void;
   onOpenCloudSettings: () => void;
   onRestoreGroupFromUrl: (restored: BillGroup) => void;
+  onImportGroupsBackup?: (importedGroups: BillGroup[]) => void;
 }
 
 export const OwnerAdminModal: React.FC<OwnerAdminModalProps> = ({
@@ -96,6 +104,7 @@ export const OwnerAdminModal: React.FC<OwnerAdminModalProps> = ({
   onDeleteGroup,
   onOpenCloudSettings,
   onRestoreGroupFromUrl,
+  onImportGroupsBackup,
 }) => {
   const [hasPasshash, setHasPasshash] = useState<boolean>(() => Boolean(getSavedPasshash()));
   const [unlocked, setUnlocked] = useState<boolean>(() => isOwnerUnlockedOnDevice());
@@ -453,7 +462,7 @@ export const OwnerAdminModal: React.FC<OwnerAdminModalProps> = ({
                 }`}
               >
                 <RotateCcw className="w-3.5 h-3.5" />
-                <span>連結還原</span>
+                <span>備份 / 還原</span>
               </button>
             </div>
 
@@ -545,17 +554,67 @@ export const OwnerAdminModal: React.FC<OwnerAdminModalProps> = ({
               </div>
             )}
 
-            {/* Tab 3: Restore Group from Shared URL / Browser History */}
+            {/* Tab 3: Permanent Backup (.json) & Restore Group from Shared URL */}
             {tab === 'restore' && (
-              <form onSubmit={handleRestoreSubmit} className="space-y-3">
-                <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 space-y-1.5 leading-relaxed">
-                  <div className="font-bold">💡 如何找回之前在別的視窗或分享連結打過的帳目？</div>
-                  <p>
-                    1. 按鍵盤 <code>Ctrl + H</code>（Mac 按 <code>Cmd + Y</code>）打開瀏覽器歷史紀錄，或去 LINE 聊天室找到之前複製過的 <code>?group=...&s=...</code> 網址。
+              <div className="space-y-4">
+                {/* 1-Click Permanent JSON File Backup & Import */}
+                <div className="p-4 rounded-2xl bg-indigo-50/70 border border-indigo-200 space-y-2.5">
+                  <div className="flex items-center gap-1.5 text-xs font-extrabold text-indigo-950">
+                    <ShieldCheck className="w-4 h-4 text-indigo-600" />
+                    <span>永久防遺失備份（下載至手機 / 電腦檔案）</span>
+                  </div>
+                  <p className="text-[11px] text-slate-600 leading-relaxed">
+                    本系統已啟用 <code>LocalStorage + IndexedDB</code> 雙重本機儲存與分享連結完整快照，不會自動刪除資料；若換新手機或清除瀏覽器紀錄前，也可一鍵下載永久備份檔：
                   </p>
-                  <p>
-                    2. 把那串網址貼在下方並點「立即還原」，裡面打過的所有成員與帳目就會完整加回來！
-                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        exportAllGroupsJson(groups);
+                        setRestoreMsg(`✅ 已下載全部 ${groups.length} 個帳本的永久備份檔 (.json)！`);
+                      }}
+                      className="py-2.5 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      <span>下載全部帳本備份 (.json)</span>
+                    </button>
+
+                    <label className="py-2.5 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-sm transition">
+                      <Upload className="w-3.5 h-3.5 text-indigo-600" />
+                      <span>匯入備份檔 (.json)</span>
+                      <input
+                        type="file"
+                        accept=".json,application/json"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          e.target.value = '';
+                          if (!file) return;
+                          const reader = new FileReader();
+                          reader.onload = () => {
+                            try {
+                              const imported = parseImportedGroupsJson(
+                                String(reader.result || '')
+                              );
+                              if (imported.length === 0) {
+                                setRestoreMsg('⚠️ 備份檔內沒有找到有效的分帳群組資料');
+                                return;
+                              }
+                              if (onImportGroupsBackup) {
+                                onImportGroupsBackup(imported);
+                              } else {
+                                imported.forEach((g) => onRestoreGroupFromUrl(g));
+                              }
+                              setRestoreMsg(`✅ 成功匯入 ${imported.length} 個分帳群組！`);
+                            } catch {
+                              setRestoreMsg('⚠️ 無法解析此 JSON 備份檔案');
+                            }
+                          };
+                          reader.readAsText(file);
+                        }}
+                      />
+                    </label>
+                  </div>
                 </div>
 
                 {restoreMsg && (
@@ -565,21 +624,30 @@ export const OwnerAdminModal: React.FC<OwnerAdminModalProps> = ({
                   </div>
                 )}
 
-                <textarea
-                  rows={3}
-                  value={restoreUrlInput}
-                  onChange={(e) => setRestoreUrlInput(e.target.value)}
-                  placeholder="貼上含有 ?group=...&s=... 的分享網址..."
-                  className="w-full p-3 rounded-2xl border border-slate-300 text-xs font-mono focus:ring-2 focus:ring-indigo-500 outline-none"
-                />
+                <form onSubmit={handleRestoreSubmit} className="space-y-3">
+                  <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 space-y-1.5 leading-relaxed">
+                    <div className="font-bold">💡 或從 LINE 聊天室分享連結還原帳目：</div>
+                    <p>
+                      把之前傳給朋友、含有 <code>?group=...&s=...</code> 的分享連結貼在下方並點「立即還原」，裡面打過的所有成員與帳目也會完整加回來！
+                    </p>
+                  </div>
 
-                <button
-                  type="submit"
-                  className="w-full py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm transition"
-                >
-                  立即從連結還原群組資料
-                </button>
-              </form>
+                  <textarea
+                    rows={3}
+                    value={restoreUrlInput}
+                    onChange={(e) => setRestoreUrlInput(e.target.value)}
+                    placeholder="貼上含有 ?group=...&s=... 的分享網址..."
+                    className="w-full p-3 rounded-2xl border border-slate-300 text-xs font-mono focus:ring-2 focus:ring-indigo-500 outline-none"
+                  />
+
+                  <button
+                    type="submit"
+                    className="w-full py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm transition"
+                  >
+                    立即從連結還原群組資料
+                  </button>
+                </form>
+              </div>
             )}
 
             {/* Bottom Actions: Create New Group & Cloud/Exchange Rate Settings */}

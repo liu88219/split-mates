@@ -15,6 +15,7 @@ import {
   RotateCcw,
   Wallet,
   Crown,
+  Camera,
 } from 'lucide-react';
 import {
   BillGroup,
@@ -41,6 +42,8 @@ import {
   isCloudSyncEnabled,
   loadLocalGroups,
   parseGroupFromUrl,
+  recoverGroupsFromIndexedDB,
+  requestPersistentStorage,
   saveLocalGroups,
   subscribeToCloudGroup,
   syncGroupToCloud,
@@ -50,6 +53,7 @@ import {
   LineUserProfile,
 } from './services/liffService';
 import { ExpenseModal } from './components/ExpenseModal';
+import { ReceiptScannerModal } from './components/ReceiptScannerModal';
 import { ShareCardModal } from './components/ShareCardModal';
 import { CloudSettingsModal } from './components/CloudSettingsModal';
 import { NewGroupModal } from './components/NewGroupModal';
@@ -240,6 +244,7 @@ export const App: React.FC = () => {
 
   // Modals
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
+  const [isReceiptScannerOpen, setIsReceiptScannerOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
@@ -273,12 +278,48 @@ export const App: React.FC = () => {
     setTimeout(() => setBannerNotice(null), 3500);
   };
 
-  // 1. Initialize LINE LIFF
+  // 1. Initialize LINE LIFF + Anti-Eviction Persistent Storage + IndexedDB Auto-Recovery
   useEffect(() => {
     initLineLiff().then(({ profile }) => {
       if (profile) setLineProfile(profile);
     });
-  }, []);
+
+    // Request persistent browser storage so iOS/mobile browsers won't auto-evict inactive storage
+    void requestPersistentStorage();
+
+    // Recover any groups from IndexedDB if LocalStorage was ever cleared by in-app browser cache
+    recoverGroupsFromIndexedDB().then((idbGroups) => {
+      const currentLocal = loadLocalGroups();
+      if (!idbGroups || idbGroups.length === 0) {
+        if (currentLocal.length > 0) {
+          saveLocalGroups(currentLocal);
+        }
+        return;
+      }
+
+      const merged = deduplicateGroupsKeepingNewest([
+        ...currentLocal,
+        ...idbGroups,
+      ]).map((g) => ensureGroupSyncKey(g));
+
+      // Check if IndexedDB recovered any edited group that was missing or older in LocalStorage
+      const recoveredNewer = idbGroups.some((ig) => {
+        if (isUneditedDefaultGroup(ig)) return false;
+        const loc = currentLocal.find((lg) => lg.id === ig.id);
+        return !loc || getEffectiveTimestamp(ig) > getEffectiveTimestamp(loc);
+      });
+
+      if (recoveredNewer) {
+        saveLocalGroups(merged);
+        if (!isFriendSharedView) {
+          setGroups(merged);
+        } else if (initialUrlState.groupId) {
+          const match = merged.find((g) => g.id === initialUrlState.groupId);
+          if (match) setGroups([match]);
+        }
+      }
+    });
+  }, [isFriendSharedView, initialUrlState.groupId]);
 
   // 2. Real-Time Cloud Sync (Initial Pull/Push + SSE Live Stream + Polling)
   useEffect(() => {
@@ -505,6 +546,32 @@ export const App: React.FC = () => {
       };
     });
     showNotice(existingId ? '✅ 已更新分帳項目！' : '✅ 已新增一筆分帳！');
+  };
+
+  const handleSaveBatchExpenses = (
+    expensesToCreate: Array<Omit<Expense, 'id' | 'createdAt'>>
+  ) => {
+    if (expensesToCreate.length === 0) return;
+    const now = Date.now();
+    updateActiveGroup((grp) => {
+      const created: Expense[] = expensesToCreate.map((expData, idx) => ({
+        ...expData,
+        id: `exp-${(now + idx).toString(36)}-${Math.random()
+          .toString(36)
+          .slice(2, 5)}`,
+        createdAt: now + idx,
+      }));
+      return {
+        ...grp,
+        expenses: [...created, ...grp.expenses],
+      };
+    });
+    setActiveTab('expenses');
+    showNotice(
+      expensesToCreate.length === 1
+        ? '📷 已將收據掃描分帳寫入帳本！'
+        : `📷 已將收據拆成 ${expensesToCreate.length} 筆分帳寫入帳本！`
+    );
   };
 
   const handleDeleteExpense = (expenseId: string) => {
@@ -830,7 +897,7 @@ export const App: React.FC = () => {
               </button>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <button
                 type="button"
                 onClick={() => setIsShareModalOpen(true)}
@@ -838,6 +905,14 @@ export const App: React.FC = () => {
               >
                 <Sparkles className="w-3.5 h-3.5 text-amber-300" />
                 產生結算圖片小卡
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsReceiptScannerOpen(true)}
+                className="px-3.5 py-2 rounded-xl bg-fuchsia-500/25 hover:bg-fuchsia-500/35 border border-fuchsia-300/30 text-white text-xs font-bold transition flex items-center gap-1.5"
+              >
+                <Camera className="w-3.5 h-3.5 text-fuchsia-200" />
+                拍收據分帳
               </button>
               <button
                 type="button"
@@ -940,17 +1015,27 @@ export const App: React.FC = () => {
                 <p className="text-xs text-slate-500">
                   點選下方按鈕新增第一筆消費，可自由勾選誰要參與平分（先付錢的人也可以不參與分攤）！
                 </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEditingExpense(null);
-                    setIsExpenseModalOpen(true);
-                  }}
-                  className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-2xl bg-indigo-600 text-white text-xs font-bold shadow-md"
-                >
-                  <Plus className="w-4 h-4" />
-                  新增第一筆帳目
-                </button>
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsReceiptScannerOpen(true)}
+                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-violet-100 hover:bg-violet-200 text-violet-800 text-xs font-bold transition"
+                  >
+                    <Camera className="w-4 h-4" />
+                    拍收據自動偵測品項
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditingExpense(null);
+                      setIsExpenseModalOpen(true);
+                    }}
+                    className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-2xl bg-indigo-600 text-white text-xs font-bold shadow-md"
+                  >
+                    <Plus className="w-4 h-4" />
+                    新增第一筆帳目
+                  </button>
+                </div>
               </div>
             ) : (
               <div className="space-y-2.5">
@@ -1420,15 +1505,25 @@ export const App: React.FC = () => {
       </main>
 
       {/* Floating Bottom Action Bar for Mobile (LINE & IG In-App Browser Friendly) */}
-      <div className="fixed bottom-0 inset-x-0 z-30 bg-white/90 backdrop-blur-md border-t border-slate-200 px-4 py-3">
-        <div className="max-w-3xl mx-auto flex items-center gap-2.5">
+      <div className="fixed bottom-0 inset-x-0 z-30 bg-white/90 backdrop-blur-md border-t border-slate-200 px-3 sm:px-4 py-3">
+        <div className="max-w-3xl mx-auto flex items-center gap-2">
           <button
             type="button"
             onClick={() => setIsShareModalOpen(true)}
-            className="flex-1 py-3 px-4 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition"
+            className="flex-1 py-3 px-2.5 sm:px-4 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-md transition"
           >
-            <Share2 className="w-4 h-4 text-emerald-400" />
-            <span>傳送結算單到 LINE / IG</span>
+            <Share2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span className="truncate">傳送結算單</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setIsReceiptScannerOpen(true)}
+            className="py-3 px-3.5 sm:px-4 rounded-2xl bg-violet-100 hover:bg-violet-200 text-violet-900 border border-violet-200 font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-sm transition shrink-0"
+            title="拍收據或菜單自動偵測品項與價錢分帳"
+          >
+            <Camera className="w-4 h-4 text-violet-700 shrink-0" />
+            <span>拍收據</span>
           </button>
 
           <button
@@ -1437,10 +1532,10 @@ export const App: React.FC = () => {
               setEditingExpense(null);
               setIsExpenseModalOpen(true);
             }}
-            className="flex-[1.3] py-3 px-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:opacity-95 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/25 transition"
+            className="flex-[1.15] py-3 px-3 sm:px-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:opacity-95 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-lg shadow-indigo-500/25 transition"
           >
-            <Plus className="w-4 h-4" />
-            <span>記一筆花費</span>
+            <Plus className="w-4 h-4 shrink-0" />
+            <span className="truncate">記一筆花費</span>
           </button>
         </div>
       </div>
@@ -1453,6 +1548,18 @@ export const App: React.FC = () => {
         liveRates={liveRates}
         onClose={() => setIsExpenseModalOpen(false)}
         onSave={handleSaveExpense}
+        onSwitchToReceiptScanner={() => {
+          setIsExpenseModalOpen(false);
+          setIsReceiptScannerOpen(true);
+        }}
+      />
+
+      <ReceiptScannerModal
+        isOpen={isReceiptScannerOpen}
+        group={activeGroup}
+        liveRates={liveRates}
+        onClose={() => setIsReceiptScannerOpen(false)}
+        onSaveExpenses={handleSaveBatchExpenses}
       />
 
       <ShareCardModal
@@ -1517,15 +1624,35 @@ export const App: React.FC = () => {
         onDeleteGroup={handleRequestDeleteGroup}
         onOpenCloudSettings={() => setIsSettingsModalOpen(true)}
         onRestoreGroupFromUrl={(restored) => {
+          const ensured = ensureGroupSyncKey(restored);
           const allSaved = loadLocalGroups();
-          const exists = allSaved.some((g) => g.id === restored.id);
+          const exists = allSaved.some((g) => g.id === ensured.id);
           const next = exists
-            ? allSaved.map((g) => (g.id === restored.id ? restored : g))
-            : [restored, ...allSaved];
+            ? allSaved.map((g) => (g.id === ensured.id ? ensured : g))
+            : [ensured, ...allSaved];
           saveLocalGroups(next);
           setGroups(next);
-          setActiveGroupId(restored.id);
-          showNotice(`🎉 已完整還原「${restored.name}」所有成員與帳目！`);
+          setActiveGroupId(ensured.id);
+          if (isCloudSyncEnabled()) {
+            void syncGroupToCloud(ensured);
+          }
+          showNotice(`🎉 已完整還原「${ensured.name}」所有成員與帳目！`);
+        }}
+        onImportGroupsBackup={(importedList) => {
+          const allSaved = loadLocalGroups();
+          const merged = deduplicateGroupsKeepingNewest([
+            ...importedList.map((g) => ensureGroupSyncKey(g)),
+            ...allSaved,
+          ]);
+          saveLocalGroups(merged);
+          setGroups(merged);
+          if (importedList[0]) {
+            setActiveGroupId(importedList[0].id);
+          }
+          if (isCloudSyncEnabled()) {
+            importedList.forEach((g) => void syncGroupToCloud(g));
+          }
+          showNotice(`🎉 已匯入並永久備份 ${importedList.length} 個分帳群組！`);
         }}
       />
 

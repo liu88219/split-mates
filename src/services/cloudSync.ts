@@ -14,6 +14,9 @@ import { BillGroup } from '../types/bill';
 const LOCAL_GROUPS_KEY = 'splitmates_groups_v1';
 const FIREBASE_CONFIG_STORAGE_KEY = 'splitmates_firebase_config_v1';
 const RELAY_BASE_URL = 'https://ntfy.sh';
+const IDB_NAME = 'SplitMatesDB';
+const IDB_STORE = 'kv';
+const IDB_GROUPS_KEY = 'groups_v1';
 
 export interface FirebaseConfigInput {
   apiKey: string;
@@ -165,7 +168,104 @@ export function isCloudSyncEnabled(): boolean {
 }
 
 /**
- * 將群組資料儲存至本機 LocalStorage
+ * 向瀏覽器申請「永久儲存權限 (Persistent Storage)」，降低 iOS Safari / 手機瀏覽器久未開啟自動清除快取的機率
+ */
+export async function requestPersistentStorage(): Promise<boolean> {
+  try {
+    if (
+      typeof navigator !== 'undefined' &&
+      navigator.storage &&
+      typeof navigator.storage.persist === 'function'
+    ) {
+      const alreadyPersisted =
+        typeof navigator.storage.persisted === 'function'
+          ? await navigator.storage.persisted()
+          : false;
+      if (alreadyPersisted) return true;
+      return await navigator.storage.persist();
+    }
+  } catch {
+    // ignore
+  }
+  return false;
+}
+
+function openSplitMatesDb(): Promise<IDBDatabase | null> {
+  return new Promise((resolve) => {
+    try {
+      if (typeof indexedDB === 'undefined') {
+        resolve(null);
+        return;
+      }
+      const req = indexedDB.open(IDB_NAME, 1);
+      req.onupgradeneeded = () => {
+        const db = req.result;
+        if (!db.objectStoreNames.contains(IDB_STORE)) {
+          db.createObjectStore(IDB_STORE);
+        }
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => resolve(null);
+    } catch {
+      resolve(null);
+    }
+  });
+}
+
+async function mirrorGroupsToIndexedDB(groups: BillGroup[]): Promise<void> {
+  const db = await openSplitMatesDb();
+  if (!db) return;
+  return new Promise((resolve) => {
+    try {
+      const tx = db.transaction(IDB_STORE, 'readwrite');
+      tx.objectStore(IDB_STORE).put(groups, IDB_GROUPS_KEY);
+      tx.oncomplete = () => {
+        db.close();
+        resolve();
+      };
+      tx.onerror = () => {
+        db.close();
+        resolve();
+      };
+    } catch {
+      db.close();
+      resolve();
+    }
+  });
+}
+
+/**
+ * 當 LocalStorage 因 LINE / IG 內建瀏覽器清理快取而遺失時，自動從 IndexedDB 雙重備份救回帳本
+ */
+export async function recoverGroupsFromIndexedDB(): Promise<BillGroup[] | null> {
+  const db = await openSplitMatesDb();
+  if (!db) return null;
+  return new Promise((resolve) => {
+    try {
+      const tx = db.transaction(IDB_STORE, 'readonly');
+      const req = tx.objectStore(IDB_STORE).get(IDB_GROUPS_KEY);
+      req.onsuccess = () => {
+        const val = req.result;
+        db.close();
+        if (Array.isArray(val) && val.length > 0) {
+          resolve(val as BillGroup[]);
+        } else {
+          resolve(null);
+        }
+      };
+      req.onerror = () => {
+        db.close();
+        resolve(null);
+      };
+    } catch {
+      db.close();
+      resolve(null);
+    }
+  });
+}
+
+/**
+ * 將群組資料讀取自本機 LocalStorage
  */
 export function loadLocalGroups(): BillGroup[] {
   try {
@@ -178,12 +278,67 @@ export function loadLocalGroups(): BillGroup[] {
   }
 }
 
+/**
+ * 將群組資料同時寫入 LocalStorage 與 IndexedDB 雙重本機資料庫（無過期時間限制）
+ */
 export function saveLocalGroups(groups: BillGroup[]): void {
   try {
     localStorage.setItem(LOCAL_GROUPS_KEY, JSON.stringify(groups));
   } catch (err) {
     console.warn('Failed to save groups to localStorage:', err);
   }
+  void mirrorGroupsToIndexedDB(groups);
+}
+
+/**
+ * 匯出所有帳本為 .json 永久備份檔供下載保存
+ */
+export function exportAllGroupsJson(groups: BillGroup[]): void {
+  const payload = {
+    app: 'SplitMates',
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    groups: groups.map((g) => ensureGroupSyncKey(g)),
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {
+    type: 'application/json;charset=utf-8',
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const dateStr = new Date().toISOString().slice(0, 10);
+  a.href = url;
+  a.download = `SplitMates_分帳備份_${dateStr}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/**
+ * 解析匯入的 .json 備份檔
+ */
+export function parseImportedGroupsJson(rawText: string): BillGroup[] {
+  const parsed = JSON.parse(rawText);
+  const rawList: unknown[] = Array.isArray(parsed)
+    ? parsed
+    : parsed && Array.isArray(parsed.groups)
+    ? parsed.groups
+    : parsed && parsed.id && Array.isArray(parsed.members)
+    ? [parsed]
+    : [];
+
+  return rawList
+    .filter((item): item is BillGroup => {
+      if (!item || typeof item !== 'object') return false;
+      const g = item as Partial<BillGroup>;
+      return (
+        typeof g.id === 'string' &&
+        typeof g.name === 'string' &&
+        Array.isArray(g.members) &&
+        Array.isArray(g.expenses)
+      );
+    })
+    .map((g) => ensureGroupSyncKey(g));
 }
 
 /**
@@ -386,8 +541,15 @@ export function buildShareableGroupUrl(group: BillGroup): string {
   }
   params.set('mode', 'shared');
   try {
-    const compressed = encodeGroupForRelay(ensured);
-    if (compressed.length <= 2600) {
+    const slimForUrl: BillGroup =
+      ensured.coverImageUrl && ensured.coverImageUrl.length > 1200
+        ? { ...ensured, coverImageUrl: undefined }
+        : ensured;
+    const compressed = LZString.compressToEncodedURIComponent(
+      JSON.stringify(slimForUrl)
+    );
+    // 支援最高 14,000 字元壓縮快照（可容納約 60~100+ 筆帳目永久內嵌於連結中，即使超過 12 小時未開也絕不遺失）
+    if (compressed.length <= 14000) {
       params.set('s', compressed);
     }
   } catch {

@@ -10,6 +10,7 @@ import {
   UserMinus,
   CheckSquare,
   Square,
+  Camera,
 } from 'lucide-react';
 import {
   BillGroup,
@@ -35,6 +36,7 @@ interface ExpenseModalProps {
   liveRates: Partial<Record<CurrencyCode, number>>;
   onClose: () => void;
   onSave: (expenseData: Omit<Expense, 'id' | 'createdAt'>, existingId?: string) => void;
+  onSwitchToReceiptScanner?: () => void;
 }
 
 export const ExpenseModal: React.FC<ExpenseModalProps> = ({
@@ -44,6 +46,7 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
   liveRates,
   onClose,
   onSave,
+  onSwitchToReceiptScanner,
 }) => {
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState<ExpenseCategory>('food');
@@ -436,6 +439,31 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
 
         {/* Scrollable Form Body */}
         <form onSubmit={handleSubmit} className="p-5 overflow-y-auto space-y-5 flex-1">
+          {!editingExpense && onSwitchToReceiptScanner && (
+            <button
+              type="button"
+              onClick={onSwitchToReceiptScanner}
+              className="w-full p-3.5 rounded-2xl bg-gradient-to-r from-indigo-50 via-violet-50 to-fuchsia-50 hover:from-indigo-100 hover:to-fuchsia-100 border border-indigo-200 text-left flex items-center justify-between gap-3 transition shadow-sm"
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0">
+                  <Camera className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="text-xs sm:text-sm font-extrabold text-indigo-950">
+                    📷 拍收據 / 菜單自動偵測品項與價錢
+                  </div>
+                  <div className="text-[11px] text-slate-600">
+                    拍完自動列出所有品項 ➜ 逐項勾選是誰的，或勾選對象整筆平分
+                  </div>
+                </div>
+              </div>
+              <span className="text-xs font-extrabold text-indigo-600 shrink-0">
+                開啟掃描 ➜
+              </span>
+            </button>
+          )}
+
           {errorMsg && (
             <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm flex items-start gap-2.5">
               <AlertCircle className="w-5 h-5 shrink-0 mt-0.5 text-rose-500" />
