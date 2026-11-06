@@ -69,62 +69,66 @@ export function renderSettlementCardToDataUrl(
     ctx.lineCap = 'round';
 
     // Warm Butter-Yellow Dinotaeng Stage Pill so snow-white lineless BOBO pops cleanly
-    drawRoundRect(0, 4, 162, 100, 28, '#F2CA62');
+    drawRoundRect(0, 4, 168, 100, 28, '#F7CE6A');
+    // Subtle golden floor strip
+    drawRoundRect(8, 86, 152, 12, 6, '#DFAE44');
 
-    // QUOKKA (Left: solid caramel fur + denim overalls, NO dark outline, NO blush)
-    ctx.fillStyle = '#C48E63';
+    // QUOKKA (Left: V2 Gold-Standard crown ears + chubby cheeks + mouthless chunky nose)
+    ctx.fillStyle = '#C99661';
     ctx.beginPath();
-    ctx.arc(34, 28, 10, 0, Math.PI * 2);
-    ctx.arc(62, 28, 10, 0, Math.PI * 2);
+    ctx.arc(38, 27, 9.5, 0, Math.PI * 2);
+    ctx.arc(58, 27, 9.5, 0, Math.PI * 2);
     ctx.fill();
-    drawRoundRect(22, 24, 52, 50, 23, '#C48E63');
-    drawRoundRect(24, 64, 48, 32, 16, '#C48E63');
+    drawRoundRect(23, 25, 50, 48, 23, '#C99661');
+    drawRoundRect(24, 62, 48, 34, 16, '#C99661');
     // Denim Overalls (#2C4268)
     drawRoundRect(25, 72, 46, 23, 8, '#2C4268');
     drawRoundRect(33, 63, 7, 13, 3, '#2C4268');
     drawRoundRect(56, 63, 7, 13, 3, '#2C4268');
-    // Black Feet
-    ctx.fillStyle = '#14110F';
+    // Black Sole Feet
+    ctx.fillStyle = '#171210';
     ctx.beginPath();
-    ctx.ellipse(36, 97, 8, 3.5, 0, 0, Math.PI * 2);
-    ctx.ellipse(60, 97, 8, 3.5, 0, 0, Math.PI * 2);
+    ctx.ellipse(35, 96.5, 8, 3.3, 0, 0, Math.PI * 2);
+    ctx.ellipse(61, 96.5, 8, 3.3, 0, 0, Math.PI * 2);
     ctx.fill();
-    // Quokka Face: close-set eyes + vertical black bean nose + happy open mouth with coral tongue
-    ctx.fillStyle = '#14110F';
+    // Quokka Face: close-set tiny dot eyes + chunky vertical black bean nose (NO pink tongue!)
+    ctx.fillStyle = '#171210';
     ctx.beginPath();
-    ctx.ellipse(42, 41, 2.3, 2.9, 0, 0, Math.PI * 2);
-    ctx.ellipse(54, 41, 2.3, 2.9, 0, 0, Math.PI * 2);
-    ctx.ellipse(48, 49, 4, 5.4, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(48, 57, 5.2, 0, Math.PI);
-    ctx.fill();
-    ctx.fillStyle = '#E37A70';
-    ctx.beginPath();
-    ctx.ellipse(48, 60.2, 3, 1.5, 0, 0, Math.PI * 2);
+    ctx.arc(42.5, 42, 2.3, 0, Math.PI * 2);
+    ctx.arc(53.5, 42, 2.3, 0, Math.PI * 2);
+    ctx.ellipse(48, 51, 4.8, 6.5, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // BOBO (Right: pure snow-white gummy bear, NO dark outline, NO blush)
+    // Mini Stacked Marshmallows in middle
+    drawRoundRect(81, 82, 13, 12, 4, '#FFFFFF');
+    drawRoundRect(82, 70, 12, 11.5, 4, '#FFFFFF');
+    ctx.fillStyle = '#3B322B';
+    ctx.beginPath();
+    ctx.arc(86, 75, 1, 0, Math.PI * 2);
+    ctx.arc(90, 75, 1, 0, Math.PI * 2);
+    ctx.arc(85.5, 87, 1, 0, Math.PI * 2);
+    ctx.arc(89.5, 87, 1, 0, Math.PI * 2);
+    ctx.fill();
+
+    // BOBO (Right: compact stubby ~1:1 snow-white gummy bear with calm • • + ω face)
     ctx.fillStyle = '#FFFFFF';
     ctx.beginPath();
-    ctx.arc(103, 43, 7.5, 0, Math.PI * 2);
-    ctx.arc(131, 43, 7.5, 0, Math.PI * 2);
+    ctx.arc(112, 46, 7.5, 0, Math.PI * 2);
+    ctx.arc(138, 46, 7.5, 0, Math.PI * 2);
     ctx.fill();
-    drawRoundRect(94, 42, 46, 36, 18, '#FFFFFF');
-    drawRoundRect(93, 66, 48, 31, 16, '#FFFFFF');
-    // BOBO Face: close-set dot eyes + tiny nose + w mouth
-    ctx.fillStyle = '#14110F';
+    drawRoundRect(101, 44, 48, 48, 21, '#FFFFFF');
+    ctx.fillStyle = '#171210';
     ctx.beginPath();
-    ctx.ellipse(112, 56, 1.9, 2.3, 0, 0, Math.PI * 2);
-    ctx.ellipse(122, 56, 1.9, 2.3, 0, 0, Math.PI * 2);
-    ctx.ellipse(117, 61, 2.3, 1.7, 0, 0, Math.PI * 2);
+    ctx.arc(120.5, 59, 2, 0, Math.PI * 2);
+    ctx.arc(129.5, 59, 2, 0, Math.PI * 2);
+    ctx.arc(125, 64, 1.9, 0, Math.PI * 2);
     ctx.fill();
-    ctx.strokeStyle = '#14110F';
+    ctx.strokeStyle = '#171210';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(112, 64);
-    ctx.quadraticCurveTo(114.5, 67.5, 117, 64.2);
-    ctx.quadraticCurveTo(119.5, 67.5, 122, 64);
+    ctx.moveTo(119.8, 67.2);
+    ctx.quadraticCurveTo(122.4, 70.5, 125, 67);
+    ctx.quadraticCurveTo(127.6, 70.5, 130.2, 67.2);
     ctx.stroke();
 
     ctx.restore();

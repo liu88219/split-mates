@@ -934,13 +934,13 @@ export const App: React.FC = () => {
                 </div>
 
                 {/* Mobile Quokka & BOBO Mascot Duo */}
-                <QuokkaBoboHeroDuo className="w-24 h-16 shrink-0 sm:hidden" />
+                <QuokkaBoboHeroDuo className="w-28 h-16 shrink-0 sm:hidden" />
               </div>
             </div>
 
             <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0">
               {/* Desktop Quokka & BOBO Mascot Duo */}
-              <QuokkaBoboHeroDuo className="w-28 h-20 shrink-0 hidden sm:block" />
+              <QuokkaBoboHeroDuo className="w-36 h-20 shrink-0 hidden sm:block" />
 
               <div className="flex-1 sm:flex-initial sm:text-right bg-[#EFECE4] rounded-2xl p-3.5 border border-[#DDD7C9]">
                 <div className="text-xs font-bold text-[#6E6155]">群組累計總花費</div>
