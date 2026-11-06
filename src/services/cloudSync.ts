@@ -18,6 +18,9 @@ const DELETED_GROUPS_STORAGE_KEY = 'splitmates_deleted_groups_v1';
 const RELAY_BASE_URL = 'https://ntfy.sh';
 const TEXTDB_UPDATE_URL = 'https://api.textdb.online/update/';
 const TEXTDB_READ_URL = 'https://textdb.online';
+const TEXTDB_DEV_API_URL = 'https://textdb.dev/api/data';
+const CLOUD_CHUNK_PREFIX = 'SMCHUNK1:';
+const CLOUD_CHUNK_MAX_CHARS = 40000;
 const IDB_NAME = 'SplitMatesDB';
 const IDB_STORE = 'kv';
 const IDB_GROUPS_KEY = 'groups_v1';
@@ -102,7 +105,7 @@ function getGroupPermanentKeys(groupId: string, syncKey?: string): string[] {
   return Array.from(new Set(keys));
 }
 
-async function writeTextDb(key: string, value: string): Promise<boolean> {
+async function writeTextDbOnlineSingle(key: string, value: string): Promise<boolean> {
   try {
     const body = new URLSearchParams({ key, value }).toString();
     const res = await fetch(TEXTDB_UPDATE_URL, {
@@ -110,13 +113,63 @@ async function writeTextDb(key: string, value: string): Promise<boolean> {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body,
     });
+    if (!res.ok) return false;
+    const txt = (await res.text()).trim();
+    if (!txt) return true;
+    try {
+      const parsed = JSON.parse(txt) as { status?: number };
+      if (parsed && typeof parsed === 'object' && 'status' in parsed) {
+        return Number(parsed.status) === 1;
+      }
+    } catch {
+      // Non-JSON 200 OK fallback
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function writeTextDbDevSingle(key: string, value: string): Promise<boolean> {
+  try {
+    const res = await fetch(`${TEXTDB_DEV_API_URL}/${encodeURIComponent(key)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ payload: value }),
+    });
     return res.ok;
   } catch {
     return false;
   }
 }
 
-async function readTextDb(key: string): Promise<string | null> {
+async function writeChunkedToProvider(
+  baseKey: string,
+  fullValue: string,
+  writeSingle: (k: string, v: string) => Promise<boolean>
+): Promise<boolean> {
+  if (fullValue.length <= CLOUD_CHUNK_MAX_CHARS) {
+    return writeSingle(baseKey, fullValue);
+  }
+  const chunks: string[] = [];
+  for (let i = 0; i < fullValue.length; i += CLOUD_CHUNK_MAX_CHARS) {
+    chunks.push(fullValue.slice(i, i + CLOUD_CHUNK_MAX_CHARS));
+  }
+  for (let idx = 1; idx < chunks.length; idx++) {
+    if (!(await writeSingle(`${baseKey}_p${idx}`, chunks[idx]))) return false;
+  }
+  return writeSingle(baseKey, `${CLOUD_CHUNK_PREFIX}${chunks.length}:${chunks[0]}`);
+}
+
+async function writeTextDb(key: string, value: string): Promise<boolean> {
+  const [okOnline, okDev] = await Promise.all([
+    writeChunkedToProvider(key, value, writeTextDbOnlineSingle),
+    writeChunkedToProvider(key, value, writeTextDbDevSingle),
+  ]);
+  return okOnline || okDev;
+}
+
+async function readTextDbOnlineSingle(key: string): Promise<string | null> {
   try {
     const res = await fetch(`${TEXTDB_READ_URL}/${encodeURIComponent(key)}?t=${Date.now()}`, {
       cache: 'no-store',
@@ -127,6 +180,54 @@ async function readTextDb(key: string): Promise<string | null> {
   } catch {
     return null;
   }
+}
+
+async function readTextDbDevSingle(key: string): Promise<string | null> {
+  try {
+    const res = await fetch(`${TEXTDB_DEV_API_URL}/${encodeURIComponent(key)}?t=${Date.now()}`, {
+      cache: 'no-store',
+    });
+    if (!res.ok) return null;
+    const text = (await res.text()).trim();
+    if (!text) return null;
+    let parsed: unknown = JSON.parse(text);
+    if (typeof parsed === 'string') parsed = JSON.parse(parsed);
+    if (parsed && typeof parsed === 'object' && 'payload' in parsed) {
+      const p = (parsed as { payload?: unknown }).payload;
+      return typeof p === 'string' && p.trim().length > 0 ? p.trim() : null;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+async function readChunkedFromProvider(
+  baseKey: string,
+  readSingle: (k: string) => Promise<string | null>
+): Promise<string | null> {
+  const head = await readSingle(baseKey);
+  if (!head) return null;
+  if (!head.startsWith(CLOUD_CHUNK_PREFIX)) return head;
+  const rest = head.slice(CLOUD_CHUNK_PREFIX.length);
+  const colonIdx = rest.indexOf(':');
+  if (colonIdx <= 0) return null;
+  const totalChunks = Number.parseInt(rest.slice(0, colonIdx), 10);
+  const chunk0 = rest.slice(colonIdx + 1);
+  if (!Number.isFinite(totalChunks) || totalChunks < 2 || totalChunks > 60) return null;
+  const tails = await Promise.all(
+    Array.from({ length: totalChunks - 1 }, (_, i) => readSingle(`${baseKey}_p${i + 1}`))
+  );
+  if (tails.some((p) => !p)) return null;
+  return chunk0 + tails.join('');
+}
+
+async function readTextDb(key: string): Promise<string | null> {
+  const [onlineVal, devVal] = await Promise.all([
+    readChunkedFromProvider(key, readTextDbOnlineSingle),
+    readChunkedFromProvider(key, readTextDbDevSingle),
+  ]);
+  return onlineVal || devVal || null;
 }
 
 function encodeGroupForRelay(group: BillGroup): string {
@@ -351,9 +452,24 @@ export function loadLocalGroups(): BillGroup[] {
  */
 export function saveLocalGroups(groups: BillGroup[]): void {
   try {
-    localStorage.setItem(LOCAL_GROUPS_KEY, JSON.stringify(groups));
-  } catch (err) {
-    console.warn('Failed to save groups to localStorage:', err);
+    const raw = JSON.stringify(groups);
+    if (raw.length <= 120000) {
+      localStorage.setItem(LOCAL_GROUPS_KEY, raw);
+    } else {
+      const slim = groups.map((g) =>
+        g.coverImageUrl?.startsWith('data:image/') ? { ...g, coverImageUrl: undefined } : g
+      );
+      localStorage.setItem(LOCAL_GROUPS_KEY, JSON.stringify(slim));
+    }
+  } catch {
+    try {
+      const slim = groups.map((g) =>
+        g.coverImageUrl?.startsWith('data:image/') ? { ...g, coverImageUrl: undefined } : g
+      );
+      localStorage.setItem(LOCAL_GROUPS_KEY, JSON.stringify(slim));
+    } catch (err) {
+      console.warn('Failed to save groups to localStorage:', err);
+    }
   }
   void mirrorGroupsToIndexedDB(groups);
 }
