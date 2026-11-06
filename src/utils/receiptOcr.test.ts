@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { parseReceiptTextToItems } from './receiptOcr';
-import { parseImportedGroupsJson } from '../services/cloudSync';
+import {
+  buildShareableGroupUrl,
+  parseImportedGroupsJson,
+} from '../services/cloudSync';
 import { createKaohsiungGroup } from './demoData';
 
 describe('parseReceiptTextToItems', () => {
@@ -82,5 +85,26 @@ describe('parseImportedGroupsJson backup restore', () => {
     expect(parsed[0].id).toBe(g.id);
     expect(parsed[0].name).toBe(g.name);
     expect(parsed[0].syncKey).toBeTruthy();
+  });
+
+  it('builds a clean, short shareable URL safe for LINE & IG without truncation', () => {
+    // Provide window stub for Node vitest environment
+    const origWindow = (globalThis as unknown as { window?: unknown }).window;
+    (globalThis as unknown as { window: unknown }).window = {
+      location: {
+        origin: 'https://liu88219.github.io',
+        pathname: '/split-mates/',
+      },
+    };
+    try {
+      const g = createKaohsiungGroup();
+      const url = buildShareableGroupUrl(g);
+      expect(url).toContain('group=kaohsiung-trip');
+      expect(url).toContain('mode=shared');
+      expect(url).toContain('k=');
+      expect(url.length).toBeLessThan(140);
+    } finally {
+      (globalThis as unknown as { window?: unknown }).window = origWindow;
+    }
   });
 });

@@ -42,11 +42,13 @@ import {
   isCloudSyncEnabled,
   loadLocalGroups,
   parseGroupFromUrl,
+  recordDeletedGroupTombstone,
   recoverGroupsFromIndexedDB,
   requestPersistentStorage,
   saveLocalGroups,
   subscribeToCloudGroup,
   syncGroupToCloud,
+  syncOwnerVaultWithCloud,
 } from './services/cloudSync';
 import {
   initLineLiff,
@@ -278,6 +280,37 @@ export const App: React.FC = () => {
     setTimeout(() => setBannerNotice(null), 3500);
   };
 
+  // Cross-browser Owner Vault Sync (bridges iOS Home Screen App ↔ Safari ↔ Desktop)
+  const runOwnerVaultSync = async (
+    baseGroups?: BillGroup[],
+    baseActiveId?: string,
+    preferLocalActive = false
+  ) => {
+    if (isFriendSharedView) return;
+    const currentList =
+      baseGroups ||
+      (loadLocalGroups().length > 0 ? loadLocalGroups() : groups);
+    const currentActive = baseActiveId || activeGroupId;
+    const vaultRes = await syncOwnerVaultWithCloud(
+      currentList,
+      currentActive,
+      preferLocalActive
+    );
+    if (vaultRes && vaultRes.groups.length > 0) {
+      saveLocalGroups(vaultRes.groups);
+      setGroups(vaultRes.groups);
+      if (vaultRes.activeGroupId && vaultRes.activeGroupId !== currentActive) {
+        setActiveGroupId(vaultRes.activeGroupId);
+      }
+      // Ensure each edited group is also written to its individual permanent cloud key for friend share links
+      vaultRes.groups.forEach((g) => {
+        if (!isUneditedDefaultGroup(g) && g.id !== 'tokyo-trip-demo') {
+          void syncGroupToCloud(g);
+        }
+      });
+    }
+  };
+
   // 1. Initialize LINE LIFF + Anti-Eviction Persistent Storage + IndexedDB Auto-Recovery
   useEffect(() => {
     initLineLiff().then(({ profile }) => {
@@ -354,23 +387,40 @@ export const App: React.FC = () => {
       });
     };
 
-    // Initial check: pull newer from cloud, OR push local edits up to cloud if cloud is behind
-    fetchGroupFromCloud(activeGroup.id, activeGroup.syncKey).then((cloudGrp) => {
-      const localLatest =
-        loadLocalGroups().find((g) => g.id === activeGroup.id) || activeGroup;
-      if (
-        cloudGrp &&
-        getEffectiveTimestamp(cloudGrp) > getEffectiveTimestamp(localLatest)
-      ) {
-        applyRemoteIfNewer(cloudGrp);
-      } else if (
-        !isUneditedDefaultGroup(localLatest) &&
-        (!cloudGrp ||
-          getEffectiveTimestamp(localLatest) > getEffectiveTimestamp(cloudGrp))
-      ) {
-        syncGroupToCloud(localLatest);
+    const checkAndSyncNow = () => {
+      fetchGroupFromCloud(activeGroup.id, activeGroup.syncKey).then((cloudGrp) => {
+        const localLatest =
+          loadLocalGroups().find((g) => g.id === activeGroup.id) || activeGroup;
+        if (
+          cloudGrp &&
+          getEffectiveTimestamp(cloudGrp) > getEffectiveTimestamp(localLatest)
+        ) {
+          applyRemoteIfNewer(cloudGrp);
+        } else if (
+          !isUneditedDefaultGroup(localLatest) &&
+          (!cloudGrp ||
+            getEffectiveTimestamp(localLatest) > getEffectiveTimestamp(cloudGrp))
+        ) {
+          void syncGroupToCloud(localLatest);
+        }
+      });
+
+      if (!isFriendSharedView) {
+        void runOwnerVaultSync();
       }
-    });
+    };
+
+    // Initial check on mount or active group switch
+    checkAndSyncNow();
+
+    // Immediately re-sync whenever switching between iOS Home Screen App, Safari, or LINE
+    const handleVisibilityOrFocus = () => {
+      if (typeof document === 'undefined' || document.visibilityState === 'visible') {
+        checkAndSyncNow();
+      }
+    };
+    window.addEventListener('focus', handleVisibilityOrFocus);
+    document.addEventListener('visibilitychange', handleVisibilityOrFocus);
 
     const unsub = subscribeToCloudGroup(
       activeGroup.id,
@@ -381,6 +431,8 @@ export const App: React.FC = () => {
     );
 
     return () => {
+      window.removeEventListener('focus', handleVisibilityOrFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityOrFocus);
       if (unsub) unsub();
     };
   }, [cloudActive, activeGroup?.id, activeGroup?.syncKey, isFriendSharedView]);
@@ -411,15 +463,20 @@ export const App: React.FC = () => {
       });
 
       const allSaved = loadLocalGroups();
+      let finalSavedList = next;
       if (updatedTarget) {
         const target = updatedTarget as BillGroup;
         const exists = allSaved.some((g) => g.id === target.id);
-        const mergedAll = exists
+        finalSavedList = exists
           ? allSaved.map((g) => (g.id === target.id ? target : g))
           : [target, ...allSaved];
-        saveLocalGroups(mergedAll);
+        saveLocalGroups(finalSavedList);
       } else {
         saveLocalGroups(next);
+      }
+
+      if (!isFriendSharedView) {
+        void syncOwnerVaultWithCloud(finalSavedList, activeGroup.id, true);
       }
 
       if (isFriendSharedView && updatedTarget) {
@@ -458,6 +515,7 @@ export const App: React.FC = () => {
     );
     setGroups(updatedGroups);
     saveLocalGroups(updatedGroups);
+    void syncOwnerVaultWithCloud(updatedGroups, groupId, true);
 
     if (nextArchivedState) {
       const remainingActive = updatedGroups.filter((g) => !g.isArchived);
@@ -477,6 +535,7 @@ export const App: React.FC = () => {
     const sourceList = allSaved.length >= groups.length ? allSaved : groups;
     const target = sourceList.find((g) => g.id === groupId);
     if (!target) return;
+    recordDeletedGroupTombstone(groupId);
     if (target.name.includes('高雄')) {
       try {
         localStorage.setItem('splitmates_kh_deleted', 'true');
@@ -500,6 +559,7 @@ export const App: React.FC = () => {
     saveLocalGroups(remaining);
     const nextActive = remaining.find((g) => !g.isArchived) || remaining[0];
     setActiveGroupId(nextActive.id);
+    void syncOwnerVaultWithCloud(remaining, nextActive.id, true);
     showNotice(`🗑️ 已永久刪除群組「${target.name}」`);
   };
 
@@ -816,17 +876,19 @@ export const App: React.FC = () => {
                       getEffectiveTimestamp(cloudGrp) >
                         getEffectiveTimestamp(ensured)
                     ) {
-                      setGroups((prev) =>
-                        prev.map((g) => (g.id === cloudGrp.id ? cloudGrp : g))
+                      const nextList = groups.map((g) =>
+                        g.id === cloudGrp.id ? cloudGrp : g
                       );
-                      showNotice('☁️ 已從雲端拉取最新分帳紀錄！');
-                    } else {
+                      setGroups(nextList);
+                      saveLocalGroups(nextList);
+                    } else if (!isUneditedDefaultGroup(ensured)) {
                       await syncGroupToCloud({
                         ...ensured,
-                        updatedAt: Date.now(),
+                        updatedAt: ensured.updatedAt || Date.now(),
                       });
-                      showNotice('☁️ 已將最新編輯同步至朋友的分享連結！');
                     }
+                    await runOwnerVaultSync();
+                    showNotice('☁️ 已完成跨瀏覽器與分享連結永久雲端同步！');
                   }}
                   className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/30 text-emerald-200 text-xs font-semibold transition"
                 >
@@ -1591,7 +1653,8 @@ export const App: React.FC = () => {
           setGroups(next);
           setActiveGroupId(newGrp.id);
           if (isCloudSyncEnabled()) {
-            syncGroupToCloud(newGrp);
+            void syncGroupToCloud(newGrp);
+            void syncOwnerVaultWithCloud(next, newGrp.id, true);
           }
           showNotice(`🎉 已建立新分帳群組「${newGrp.name}」！`);
         }}
@@ -1617,6 +1680,11 @@ export const App: React.FC = () => {
         onSelectGroup={(gid) => {
           setActiveGroupId(gid);
           setFilterMemberId('all');
+          void syncOwnerVaultWithCloud(groups, gid, true);
+        }}
+        onOwnerPasscodeSynced={() => {
+          void runOwnerVaultSync();
+          showNotice('🔐 已連結跨瀏覽器管理員雲端保險箱，正在同步所有帳本...');
         }}
         onOpenNewGroup={() => setIsNewGroupModalOpen(true)}
         onOpenEditGroup={() => setIsEditGroupModalOpen(true)}

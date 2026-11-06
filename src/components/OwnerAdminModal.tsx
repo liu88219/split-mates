@@ -90,6 +90,7 @@ interface OwnerAdminModalProps {
   onOpenCloudSettings: () => void;
   onRestoreGroupFromUrl: (restored: BillGroup) => void;
   onImportGroupsBackup?: (importedGroups: BillGroup[]) => void;
+  onOwnerPasscodeSynced?: () => void;
 }
 
 export const OwnerAdminModal: React.FC<OwnerAdminModalProps> = ({
@@ -105,6 +106,7 @@ export const OwnerAdminModal: React.FC<OwnerAdminModalProps> = ({
   onOpenCloudSettings,
   onRestoreGroupFromUrl,
   onImportGroupsBackup,
+  onOwnerPasscodeSynced,
 }) => {
   const [hasPasshash, setHasPasshash] = useState<boolean>(() => Boolean(getSavedPasshash()));
   const [unlocked, setUnlocked] = useState<boolean>(() => isOwnerUnlockedOnDevice());
@@ -146,6 +148,7 @@ export const OwnerAdminModal: React.FC<OwnerAdminModalProps> = ({
     setPinError(null);
     setPinInput('');
     setConfirmPinInput('');
+    onOwnerPasscodeSynced?.();
   };
 
   const handleUnlock = async (e: React.FormEvent) => {
@@ -162,6 +165,7 @@ export const OwnerAdminModal: React.FC<OwnerAdminModalProps> = ({
       setOwnerUnlockedOnDevice(true);
       setPinError(null);
       setPinInput('');
+      onOwnerPasscodeSynced?.();
     } else {
       setPinError('密碼不正確，請重新輸入');
     }
@@ -271,7 +275,7 @@ export const OwnerAdminModal: React.FC<OwnerAdminModalProps> = ({
                 {hasPasshash ? '修改本機管理密碼' : '首次啟用：設定本機管理密碼'}
               </h3>
               <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                密碼將以 SHA-256 加密雜湊後僅儲存於此裝置瀏覽器本機，不會上傳至雲端或公開於程式碼中：
+                密碼以 SHA-256 加密雜湊後僅儲存於本機；在「桌面主畫面 App」與「Safari / 電腦」設定相同的管理密碼，即可自動跨瀏覽器同步妳所有的分帳群組：
               </p>
             </div>
 

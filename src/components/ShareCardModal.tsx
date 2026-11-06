@@ -16,6 +16,7 @@ import { BillGroup, MemberBalance, SimplifiedTransfer } from '../types/bill';
 import { generateLineIgSummaryText } from '../utils/settlement';
 import { renderSettlementCardToDataUrl } from '../utils/cardGenerator';
 import { shareFlexCardToLine } from '../services/liffService';
+import { syncGroupToCloud } from '../services/cloudSync';
 
 interface ShareCardModalProps {
   isOpen: boolean;
@@ -45,6 +46,8 @@ export const ShareCardModal: React.FC<ShareCardModalProps> = ({
 
   useEffect(() => {
     if (!isOpen) return;
+    // 打開分享中心時立即將本群組最新狀態寫入永久雲端儲存，確保分享出去的連結 100% 永久有效
+    void syncGroupToCloud(group);
     const url = renderSettlementCardToDataUrl(group, balances, transfers);
     setCardDataUrl(url);
     QRCode.toDataURL(shareUrl, {
