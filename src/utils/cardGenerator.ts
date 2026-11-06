@@ -73,30 +73,29 @@ export function renderSettlementCardToDataUrl(
     // Subtle golden floor strip
     drawRoundRect(8, 86, 152, 12, 6, '#DFAE44');
 
-    // QUOKKA (Left: V2 Gold-Standard crown ears + chubby cheeks + mouthless chunky nose)
+    // QUOKKA (Left: V3 99% Gold-Standard bare caramel fur + touching crown ears + mouthless chunky nose + angled stick feet)
     ctx.fillStyle = '#C99661';
     ctx.beginPath();
-    ctx.arc(38, 27, 9.5, 0, Math.PI * 2);
-    ctx.arc(58, 27, 9.5, 0, Math.PI * 2);
+    ctx.arc(40, 25, 10, 0, Math.PI * 2);
+    ctx.arc(56, 25, 10, 0, Math.PI * 2);
     ctx.fill();
-    drawRoundRect(23, 25, 50, 48, 23, '#C99661');
-    drawRoundRect(24, 62, 48, 34, 16, '#C99661');
-    // Denim Overalls (#2C4268)
-    drawRoundRect(25, 72, 46, 23, 8, '#2C4268');
-    drawRoundRect(33, 63, 7, 13, 3, '#2C4268');
-    drawRoundRect(56, 63, 7, 13, 3, '#2C4268');
-    // Black Sole Feet
+    drawRoundRect(24, 26, 48, 69, 21, '#C99661');
+    // Tiny black mitten paws holding mini cream receipt
+    drawRoundRect(41, 63, 14, 17, 3, '#FAF8F3');
     ctx.fillStyle = '#171210';
     ctx.beginPath();
-    ctx.ellipse(35, 96.5, 8, 3.3, 0, 0, Math.PI * 2);
-    ctx.ellipse(61, 96.5, 8, 3.3, 0, 0, Math.PI * 2);
+    ctx.arc(39.5, 70, 3.2, 0, Math.PI * 2);
+    ctx.arc(56.5, 70, 3.2, 0, Math.PI * 2);
+    // Angled flat black stick-oval soles (\  /)
+    ctx.ellipse(32, 91, 3.2, 8.5, -0.35, 0, Math.PI * 2);
+    ctx.ellipse(64, 91, 3.2, 8.5, 0.35, 0, Math.PI * 2);
     ctx.fill();
-    // Quokka Face: close-set tiny dot eyes + chunky vertical black bean nose (NO pink tongue!)
+    // Quokka Face: close-set tiny dot eyes + chunky round-oval black blob nose (ZERO mouth!)
     ctx.fillStyle = '#171210';
     ctx.beginPath();
-    ctx.arc(42.5, 42, 2.3, 0, Math.PI * 2);
-    ctx.arc(53.5, 42, 2.3, 0, Math.PI * 2);
-    ctx.ellipse(48, 51, 4.8, 6.5, 0, 0, Math.PI * 2);
+    ctx.arc(43, 41, 2.3, 0, Math.PI * 2);
+    ctx.arc(53, 41, 2.3, 0, Math.PI * 2);
+    ctx.ellipse(48, 50.5, 5.4, 6.4, 0, 0, Math.PI * 2);
     ctx.fill();
 
     // Mini Stacked Marshmallows in middle
@@ -110,25 +109,29 @@ export function renderSettlementCardToDataUrl(
     ctx.arc(89.5, 87, 1, 0, Math.PI * 2);
     ctx.fill();
 
-    // BOBO (Right: compact stubby ~1:1 snow-white gummy bear with calm • • + ω face)
+    // Brown Wooden Stool + Snow-White Cloud BOBO with connected upturned ω smile
+    drawRoundRect(104, 79, 44, 5.5, 2.5, '#785634');
+    drawRoundRect(109, 83, 5.5, 13, 2, '#785634');
+    drawRoundRect(137, 83, 5.5, 13, 2, '#785634');
     ctx.fillStyle = '#FFFFFF';
     ctx.beginPath();
-    ctx.arc(112, 46, 7.5, 0, Math.PI * 2);
-    ctx.arc(138, 46, 7.5, 0, Math.PI * 2);
+    ctx.arc(114, 38, 7.5, 0, Math.PI * 2);
+    ctx.arc(138, 38, 7.5, 0, Math.PI * 2);
     ctx.fill();
-    drawRoundRect(101, 44, 48, 48, 21, '#FFFFFF');
+    drawRoundRect(104, 37, 44, 43, 19, '#FFFFFF');
     ctx.fillStyle = '#171210';
     ctx.beginPath();
-    ctx.arc(120.5, 59, 2, 0, Math.PI * 2);
-    ctx.arc(129.5, 59, 2, 0, Math.PI * 2);
-    ctx.arc(125, 64, 1.9, 0, Math.PI * 2);
+    ctx.arc(121.5, 51, 2.1, 0, Math.PI * 2);
+    ctx.arc(130.5, 51, 2.1, 0, Math.PI * 2);
     ctx.fill();
     ctx.strokeStyle = '#171210';
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 2.2;
     ctx.beginPath();
-    ctx.moveTo(119.8, 67.2);
-    ctx.quadraticCurveTo(122.4, 70.5, 125, 67);
-    ctx.quadraticCurveTo(127.6, 70.5, 130.2, 67.2);
+    ctx.moveTo(126, 54.8);
+    ctx.lineTo(126, 58.2);
+    ctx.moveTo(120.5, 58.2);
+    ctx.quadraticCurveTo(123.2, 61.8, 126, 58);
+    ctx.quadraticCurveTo(128.8, 61.8, 131.5, 58.2);
     ctx.stroke();
 
     ctx.restore();

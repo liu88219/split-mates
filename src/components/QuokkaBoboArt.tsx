@@ -52,20 +52,19 @@ export const QuokkaFaceBadge: React.FC<{ className?: string }> = ({
       <ChalkFilter id={fid} scale={2.0} />
       <rect width="120" height="120" rx="32" fill={BUTTER} />
       <g filter={`url(#${fid})`}>
-        {/* Unified crown-ears + chubby lower-cheek silhouette (mouthless chunky nose gold standard) */}
+        {/* V3 99% Gold-Standard touching crown-ears + bumpy caramel silhouette + mouthless chunky nose */}
         <path
-          d="M 44 36
-             C 30 21, 19 34, 28 51
-             C 21 63, 20 83, 31 95
+          d="M 59.5 34
+             C 51 17, 29 22, 33 43
+             C 23 53, 21 82, 31 95
              C 42 104, 78 104, 89 95
-             C 100 83, 99 63, 92 51
-             C 101 34, 90 21, 76 36
-             C 69 33, 51 33, 44 36 Z"
+             C 99 82, 97 53, 87 43
+             C 91 22, 69 17, 60.5 34 Z"
           fill={FUR}
         />
-        <circle cx="52.5" cy="58" r="2.8" fill={INK} />
-        <circle cx="67.5" cy="58" r="2.8" fill={INK} />
-        <ellipse cx="60" cy="70.5" rx="6.4" ry="8.6" fill={INK} />
+        <circle cx="52.5" cy="56" r="2.9" fill={INK} />
+        <circle cx="67.5" cy="56" r="2.9" fill={INK} />
+        <ellipse cx="60" cy="69.5" rx="7.2" ry="8.4" fill={INK} />
       </g>
     </svg>
   );
@@ -107,14 +106,13 @@ export const BoboFaceBadge: React.FC<{ className?: string }> = ({
              C 68 37, 52 37, 43 39 Z"
           fill={BOBO_WHITE}
         />
-        <circle cx="53.5" cy="57.5" r="2.5" fill={INK} />
-        <circle cx="66.5" cy="57.5" r="2.5" fill={INK} />
-        <circle cx="60" cy="64.5" r="2.4" fill={INK} />
+        <circle cx="53.5" cy="56.5" r="2.7" fill={INK} />
+        <circle cx="66.5" cy="56.5" r="2.7" fill={INK} />
         <path
-          d="M 52.5 69.5 Q 56.2 73.5 60 68.5 Q 63.8 73.5 67.5 69.5"
+          d="M 60 62.5 L 60 67.5 M 52.2 67.2 Q 56 72.5 60 67.2 Q 64 72.5 67.8 67.2"
           fill="none"
           stroke={INK}
-          strokeWidth="2.4"
+          strokeWidth="2.9"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
@@ -126,7 +124,7 @@ export const BoboFaceBadge: React.FC<{ className?: string }> = ({
 export const QuokkaBoboHeroDuo: React.FC<{ className?: string }> = ({
   className = 'w-36 h-20',
 }) => {
-  const src = './assets/hero-split-mates.webp?v=3';
+  const src = './assets/hero-split-mates.webp?v=4';
   return (
     <div
       className={`overflow-hidden rounded-2xl border border-[#DFBA54]/60 bg-[#F7CE6A] shadow-sm select-none ${className}`}
@@ -146,7 +144,7 @@ export const QuokkaBoboHeroDuo: React.FC<{ className?: string }> = ({
 export const QuokkaEmptyReceiptArt: React.FC<{ className?: string }> = ({
   className = 'w-44 h-36 mx-auto',
 }) => {
-  const src = './assets/gold-marshmallow-tower.webp?v=3';
+  const src = './assets/gold-marshmallow-tower.webp?v=4';
   return (
     <div
       className={`overflow-hidden rounded-3xl border border-[#DDD7C9] bg-[#DBD7CA] shadow-sm select-none ${className}`}
